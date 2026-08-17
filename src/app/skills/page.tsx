@@ -1,19 +1,22 @@
 import styles from "./page.module.css";
 import Link from "next/link";
 import Image from "next/image";
+import { AboutDrawer } from "../../components/about/AboutDrawer";
 
 export default function SkillsPage() {
   return (
     <main className={styles.page}>
       <header className={styles.header}>
         <div className={styles.avatarWrap}>
-          <Image 
-            src="/rafi_hi.png" 
-            alt="Rafi" 
-            width={56} 
-            height={56} 
-            className={styles.avatar} 
-          />
+          <a href="#about">
+            <Image 
+              src="/rafi_hi.png" 
+              alt="Rafi" 
+              width={64} 
+              height={64} 
+              className={styles.avatar} 
+            />
+          </a>
         </div>
         <nav className={styles.nav} aria-label="Primary">
           <Link href="/">
@@ -32,11 +35,15 @@ export default function SkillsPage() {
             <span className={styles.navIcon} style={{ maskImage: "url('/nav-skills.svg')", WebkitMaskImage: "url('/nav-skills.svg')" }} />
             Skills
           </Link>
+          <a href="#about">
+            <span className={styles.navIcon} style={{ maskImage: "url('/nav-about.svg')", WebkitMaskImage: "url('/nav-about.svg')" }} />
+            About
+          </a>
         </nav>
 
-        <Link className={styles.about} href="#">
-          <span className={styles.navIcon} style={{ maskImage: "url('/nav-about.svg')", WebkitMaskImage: "url('/nav-about.svg')" }} />
-          About
+        <Link className={styles.resume} href="/resume.pdf" target="_blank" rel="noopener noreferrer">
+          <span className={styles.navIcon} style={{ maskImage: "url('/nav-resume.svg')", WebkitMaskImage: "url('/nav-resume.svg')" }} />
+          Resume
         </Link>
       </header>
 
@@ -80,6 +87,8 @@ export default function SkillsPage() {
           </div>
         </div>
       </section>
+
+      <AboutDrawer />
     </main>
   );
 }

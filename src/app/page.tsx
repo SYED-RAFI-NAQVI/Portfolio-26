@@ -6,25 +6,28 @@ import { DotMatrixPlant } from "../components/home/DotMatrixPlant";
 import { DotMatrixCloud } from "../components/home/DotMatrixCloud";
 import { TimeBasedCelestial } from "../components/home/TimeBasedCelestial";
 import { InteractionSounds } from "../components/InteractionSounds";
+import { AboutDrawer } from "../components/about/AboutDrawer";
 
 export const metadata: Metadata = {
-  title: "Rafi — AI Product Builder",
-  description: "Portfolio of Rafi, building Applied AI, Software, and Products.",
+  title: "Rafi Naqvi — Developer, Builder",
+  description: "Rafi builds AI products, software, and occasionally companies.",
 };
 
 export default function Home() {
   return (
-    <main className={styles.page}>
+    <div className={styles.page}>
       <InteractionSounds />
       <header className={styles.header}>
         <div className={styles.avatarWrap}>
-          <Image 
-            src="/rafi_hi.png" 
-            alt="Rafi" 
-            width={56} 
-            height={56} 
-            className={styles.avatar} 
-          />
+          <a href="#about">
+            <Image 
+              src="/rafi_hi.png" 
+              alt="Rafi" 
+              width={64} 
+              height={64} 
+              className={styles.avatar} 
+            />
+          </a>
         </div>
         <nav className={styles.nav} aria-label="Primary">
           <Link href="/" className={styles.active}>
@@ -43,11 +46,15 @@ export default function Home() {
             <span className={styles.navIcon} style={{ maskImage: "url('/nav-skills.svg')", WebkitMaskImage: "url('/nav-skills.svg')" }} />
             Skills
           </Link>
+          <a href="#about">
+            <span className={styles.navIcon} style={{ maskImage: "url('/nav-about.svg')", WebkitMaskImage: "url('/nav-about.svg')" }} />
+            About
+          </a>
         </nav>
 
-        <Link className={styles.about} href="#">
-          <span className={styles.navIcon} style={{ maskImage: "url('/nav-about.svg')", WebkitMaskImage: "url('/nav-about.svg')" }} />
-          About
+        <Link className={styles.resume} href="/resume.pdf" target="_blank" rel="noopener noreferrer">
+          <span className={styles.navIcon} style={{ maskImage: "url('/nav-resume.svg')", WebkitMaskImage: "url('/nav-resume.svg')" }} />
+          Resume
         </Link>
       </header>
 
@@ -66,17 +73,17 @@ export default function Home() {
             </span>
           </span>{" "}
           <span className={styles.soft}>builds</span>{" "}
-          <a className={styles.bioLink} href="#" data-sfx="ai" data-hover-sound="ambient">
+          <Link className={styles.bioLink} href="/work?filter=ai" data-sfx="ai" data-hover-sound="ambient">
             <span className={styles.label}>AI products</span>
-          </a>
+          </Link>
           ,{" "}
-          <a className={styles.bioLink} href="#" data-sfx="software" data-hover-sound="ambient">
+          <Link className={styles.bioLink} href="/work?filter=software" data-sfx="software" data-hover-sound="ambient">
             <span className={styles.label}>software</span>
-          </a>
+          </Link>
           , <span className={styles.soft}>and occasionally</span>{" "}
-          <a className={styles.bioLink} href="#" data-sfx="companies" data-hover-sound="ambient">
+          <Link className={styles.bioLink} href="/work?filter=companies" data-sfx="companies" data-hover-sound="ambient">
             <span className={styles.label}>companies</span>
-          </a>
+          </Link>
           . <span className={styles.soft}>6+ years making ideas real.</span>
           <span className={styles.journeyBreak}>
             <Link
@@ -93,7 +100,7 @@ export default function Home() {
 
       <DotMatrixPlant className={styles.plantContainer} />
 
-
-    </main>
+      <AboutDrawer />
+    </div>
   );
 }
