@@ -1,0 +1,125 @@
+.soundPrompt {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%);
+
+  z-index: 100;
+
+  display: flex;
+  align-items: center;
+
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+
+  color: rgba(255, 255, 255, 0.55);
+
+  pointer-events: none;
+
+  opacity: 1;
+  transition:
+    opacity 400ms ease,
+    transform 400ms cubic-bezier(.22, 1, .36, 1);
+}
+
+.soundPrompt::before {
+  content: "";
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  margin-right: 8px;
+  background-color: rgba(255, 255, 255, 0.35);
+  
+  mask-image: url("/sound-on.svg");
+  -webkit-mask-image: url("/sound-on.svg");
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+}
+
+.hidden {
+  opacity: 0;
+  transform: translate(-50%, 5px);
+  pointer-events: none;
+}
+
+.soundToggle {
+  position: fixed;
+  left: 50%;
+  bottom: 24px;
+  transform: translateX(-50%) translateY(10px);
+  z-index: 100;
+  
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  background: transparent;
+  border: none;
+  cursor: pointer;
+
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+
+  color: rgba(255, 255, 255, 0.55);
+  
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    opacity 400ms ease,
+    transform 400ms cubic-bezier(.22, 1, .36, 1),
+    color 200ms ease;
+}
+
+.soundToggle:hover {
+  color: rgba(255, 255, 255, 1);
+}
+
+.soundToggle.visible {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateX(-50%) translateY(0);
+}
+
+.mobile {
+  display: none;
+}
+
+@media (max-width: 700px) {
+  .desktop {
+    display: none;
+  }
+
+  .mobile {
+    display: inline;
+  }
+}
+
+.icon {
+  width: 16px;
+  height: 16px;
+  background-color: currentColor;
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+}
+
+.iconOn {
+  mask-image: url("/sound-on.svg");
+  -webkit-mask-image: url("/sound-on.svg");
+}
+
+.iconOff {
+  mask-image: url("/sound-off.svg");
+  -webkit-mask-image: url("/sound-off.svg");
+}

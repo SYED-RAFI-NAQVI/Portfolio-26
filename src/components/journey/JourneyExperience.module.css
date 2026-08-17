@@ -1,0 +1,308 @@
+.root {
+  --journey-canvas: #080808;
+  --journey-elevated: #0d0d0d;
+  --journey-ink: #f2f2f2;
+  --journey-body: #a1a1a1;
+  --journey-mute: #737373;
+  --journey-faint: #525252;
+  --journey-hairline: #242424;
+  --journey-hairline-soft: #171717;
+  --journey-axis-y: 55%;
+
+  min-height: 100svh;
+  background: var(--journey-canvas);
+  color: var(--journey-ink);
+  color-scheme: dark;
+}
+
+.scrollSection {
+  position: relative;
+  height: 600svh; /* JS replaces this with the exact measured scroll range. */
+  background: var(--journey-canvas);
+}
+
+.stickyStage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--journey-canvas);
+}
+
+.viewport {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.grid {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  opacity: 0.42;
+  background-image:
+    linear-gradient(to right, var(--journey-hairline-soft) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--journey-hairline-soft) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: linear-gradient(to bottom, transparent, black 14%, black 86%, transparent);
+}
+
+.track {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  width: max-content;
+  height: 100%;
+  min-width: 100vw;
+  padding-inline: 10vw 18vw;
+  will-change: transform;
+}
+
+.axis {
+  position: absolute;
+  top: var(--journey-axis-y);
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: var(--journey-hairline);
+}
+
+.introPanel,
+.outroPanel {
+  position: relative;
+  display: flex;
+  flex: none;
+  width: min(92vw, 1100px);
+  height: 100%;
+  align-items: center;
+  padding-inline: clamp(1.5rem, 5vw, 5rem);
+}
+
+.introPanel {
+  padding-top: 4rem;
+  padding-bottom: 18vh;
+}
+
+.outroPanel {
+  width: min(72vw, 820px);
+  padding-top: 22vh;
+}
+
+.milestone {
+  position: relative;
+  display: grid;
+  width: clamp(360px, 56vw, 760px);
+  height: 100%;
+  grid-template-rows: var(--journey-axis-y) 1fr;
+}
+
+.milestone[data-size="sm"] {
+  width: clamp(280px, 38vw, 440px);
+}
+
+.milestone[data-size="lg"] {
+  width: clamp(500px, 68vw, 920px);
+}
+
+.markerRow {
+  position: absolute;
+  top: var(--journey-axis-y);
+  left: 50%;
+  z-index: 4;
+  width: 1px;
+  height: 1px;
+}
+
+.marker {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 9px;
+  height: 9px;
+  border: 1px solid var(--journey-ink);
+  border-radius: 999px;
+  background: var(--journey-canvas);
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 0 5px var(--journey-canvas);
+}
+
+.markerIndex {
+  position: absolute;
+  top: 13px;
+  left: 12px;
+  width: max-content;
+  font-family: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--journey-faint);
+}
+
+.milestoneContent {
+  position: absolute;
+  left: 12%;
+  width: min(78%, 580px);
+}
+
+.contentAbove {
+  bottom: calc(45% + 100px);
+}
+
+.contentBelow {
+  top: calc(55% + 100px);
+}
+
+.connectorBox {
+  position: absolute;
+  left: 50%;
+  width: 140px;
+  height: 100px;
+  z-index: 3;
+}
+
+.connectorAbove {
+  bottom: 45%;
+}
+
+.connectorBelow {
+  top: 55%;
+}
+
+/* Align the SVG box so its visual start point sits exactly on the timeline marker (left: 50%) */
+.alignStart {
+  transform: translateX(0); /* x=0 is at 50% */
+}
+.alignCenter {
+  transform: translateX(-50%); /* x=50 is at 50% */
+}
+.alignEnd {
+  transform: translateX(-100%); /* x=100 is at 50% */
+}
+
+.mediaPlaceholder {
+  position: relative;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border: 1px solid var(--journey-hairline);
+  border-radius: 12px;
+  background:
+    linear-gradient(to right, transparent calc(50% - 0.5px), var(--journey-hairline-soft) 50%, transparent calc(50% + 0.5px)),
+    linear-gradient(to bottom, transparent calc(50% - 0.5px), var(--journey-hairline-soft) 50%, transparent calc(50% + 0.5px)),
+    var(--journey-elevated);
+}
+
+.mediaPlaceholder::before,
+.mediaPlaceholder::after {
+  content: "";
+  position: absolute;
+  background: var(--journey-hairline);
+}
+
+.mediaPlaceholder::before {
+  left: 12px;
+  right: 12px;
+  top: 12px;
+  height: 1px;
+}
+
+.mediaPlaceholder::after {
+  top: 12px;
+  bottom: 12px;
+  left: 12px;
+  width: 1px;
+}
+
+.dotMatrix {
+  width: fit-content;
+  color: transparent;
+  background-image: radial-gradient(circle, var(--journey-ink) 0.8px, transparent 0.9px);
+  background-size: 3px 3px;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  opacity: 0.82;
+}
+
+.progressRail {
+  position: relative;
+  height: 1px;
+  flex: 1;
+  overflow: hidden;
+  background: var(--journey-hairline);
+}
+
+.progressFill {
+  position: absolute;
+  inset: 0;
+  transform: scaleX(0);
+  transform-origin: 0 50%;
+  background: var(--journey-ink);
+  will-change: transform;
+}
+
+@media (max-width: 767px) {
+  .root {
+    --journey-axis-y: 58%;
+  }
+
+  .grid {
+    background-size: 40px 40px;
+  }
+
+  .track {
+    padding-inline: 4vw 14vw;
+  }
+
+  .introPanel {
+    width: 94vw;
+    padding-top: 2rem;
+    padding-bottom: 20vh;
+  }
+
+  .milestone {
+    width: 82vw;
+  }
+
+  .milestone[data-size="sm"] {
+    width: 68vw;
+  }
+
+  .milestone[data-size="lg"] {
+    width: 90vw;
+  }
+
+  .milestoneContent {
+    left: 8%;
+    width: 84%;
+  }
+
+  .contentAbove {
+    bottom: calc(42% + 60px);
+  }
+
+  .contentBelow {
+    top: calc(58% + 60px);
+  }
+
+  .connectorBox {
+    height: 60px;
+    width: 90px;
+  }
+  
+  .connectorAbove {
+    bottom: 42%;
+  }
+  
+  .connectorBelow {
+    top: 58%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .track,
+  .progressFill {
+    scroll-behavior: auto;
+  }
+}

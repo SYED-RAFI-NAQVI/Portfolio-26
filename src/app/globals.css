@@ -1,26 +1,131 @@
 @import "tailwindcss";
 
+/* ─── Design System Tokens — Dark Mode ──────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Surface */
+  --canvas:          #0a0a0a;
+  --canvas-elevated: #111111;
+  --hairline:        #1f1f1f;
+  --hairline-soft:   #171717;
+
+  /* Text */
+  --ink:   #ededed;
+  --body:  #a1a1a1;
+  --mute:  #6b6b6b;
+  --faint: #444444;
+
+  /* Accent */
+  --link:      #3b9eff;
+  --link-deep: #60b0ff;
+
+  /* Radius */
+  --r-sm:   6px;
+  --r-md:   12px;
+  --r-lg:   16px;
+  --r-pill: 100px;
+  --r-full: 9999px;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+/* ─── Base ───────────────────────────────────────────────────────────────────  */
+*,
+*::before,
+*::after { box-sizing: border-box; }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  background: var(--canvas);
+  color: var(--ink);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  margin: 0;
+  background: var(--canvas);
+  color: var(--ink);
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
+
+/* ─── Typography Scale ───────────────────────────────────────────────────────  */
+.type-display-xl {
+  font-size: 48px;
+  font-weight: 600;
+  line-height: 48px;
+  letter-spacing: -2.4px;
+}
+.type-heading-lg {
+  font-size: 32px;
+  font-weight: 600;
+  line-height: 40px;
+  letter-spacing: -1.28px;
+}
+.type-heading-md {
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 28px;
+  letter-spacing: -0.4px;
+}
+.type-mono-eyebrow {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 12px;
+  font-weight: 500;
+  line-height: 16px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.type-body-lg { font-size: 16px; font-weight: 400; line-height: 24px; }
+.type-body-md { font-size: 14px; font-weight: 400; line-height: 20px; }
+.type-body-sm { font-size: 12px; font-weight: 400; line-height: 16px; }
+
+/* ─── Mesh Gradient — the system's only decorative flourish ─────────────────  */
+.mesh-gradient {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    radial-gradient(ellipse 60% 50% at 20% 60%, rgba(0,124,240,0.18) 0%, transparent 70%),
+    radial-gradient(ellipse 55% 60% at 80% 40%, rgba(121,40,202,0.14) 0%, transparent 70%),
+    radial-gradient(ellipse 50% 70% at 50% 20%, rgba(0,223,216,0.10) 0%, transparent 60%),
+    radial-gradient(ellipse 45% 55% at 75% 80%, rgba(255,0,128,0.10) 0%, transparent 65%),
+    radial-gradient(ellipse 40% 45% at 30% 90%, rgba(249,203,40,0.08) 0%, transparent 60%);
+}
+
+/* ─── Card Primitives ────────────────────────────────────────────────────────  */
+.feature-card {
+  background: var(--canvas-elevated);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-md);
+  padding: 24px;
+}
+.feature-card-elevated {
+  background: var(--canvas-elevated);
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-lg);
+  padding: 32px;
+  box-shadow:
+    0px 1px 1px rgba(0,0,0,0.4),
+    0px 2px 4px rgba(0,0,0,0.3),
+    0px 8px 24px -4px rgba(0,0,0,0.5);
+}
+
+/* ─── Button Primitives ──────────────────────────────────────────────────────  */
+.btn-primary {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--ink); color: #fff;
+  border-radius: var(--r-pill); border: none;
+  padding: 0 20px; height: 40px;
+  font-size: 14px; font-weight: 500; line-height: 20px;
+  cursor: pointer; text-decoration: none;
+  transition: opacity 0.15s ease;
+}
+.btn-primary:hover { opacity: 0.82; }
+
+.btn-secondary {
+  display: inline-flex; align-items: center; gap: 8px;
+  background: var(--canvas-elevated); color: var(--ink);
+  border: 1px solid var(--hairline); border-radius: var(--r-pill);
+  padding: 0 20px; height: 40px;
+  font-size: 14px; font-weight: 500; line-height: 20px;
+  cursor: pointer; text-decoration: none;
+  transition: border-color 0.15s ease;
+}
+.btn-secondary:hover { border-color: #c0c0c0; }

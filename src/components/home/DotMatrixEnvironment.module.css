@@ -1,0 +1,137 @@
+.wrap {
+  display: inline-flex;
+  place-items: center;
+  position: relative;
+}
+
+.matrix {
+  display: grid;
+  transform-origin: center;
+}
+
+.dot {
+  width: 4px;
+  height: 4px;
+  justify-self: center;
+  align-self: center;
+  border-radius: 50%;
+  background: transparent;
+}
+
+.dotOn { background: #e7e7e7; }
+.dotMid { background: #8b8b8b; }
+.dotDim { background: #4d4d4d; }
+
+/* SUN */
+.sunWrap {
+  animation: sunTick 25.2s steps(36) infinite;
+}
+@keyframes sunTick {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.sunWrap:hover .matrix {
+  animation: sunBreathe 900ms ease-out 1;
+}
+@keyframes sunBreathe {
+  0% { transform: scale(1); opacity: 0.92; }
+  45% { transform: scale(1.035); opacity: 1; }
+  100% { transform: scale(1); opacity: 0.92; }
+}
+
+/* MOON */
+.moonWrap .matrix {
+  transition: transform 600ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.moonWrap:hover .matrix {
+  transform: rotate(-3deg);
+}
+
+/* MOUNTAINS */
+.mountainsWrap .matrix {
+  transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1), opacity 300ms ease;
+}
+.mountainsWrap:hover .matrix {
+  transform: translateY(-3px);
+}
+
+/* STARS */
+.starsWrap:hover .starHot {
+  animation: starBlink 680ms ease-out 1;
+}
+@keyframes starBlink {
+  0% { opacity: 1; }
+  30% { opacity: 0.25; }
+  48% { opacity: 1; }
+  72% { opacity: 0.55; }
+  100% { opacity: 1; }
+}
+
+/* WAVE */
+.waveWrap .matrix {
+  transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+.waveWrap:hover .matrix {
+  transform: translateX(5px);
+}
+
+/* BIRDS */
+.flock {
+  width: min(760px, 92vw);
+  min-height: 420px;
+  position: relative;
+}
+
+.pigeon {
+  position: absolute;
+  display: grid;
+  grid-template-columns: repeat(25, 1fr);
+  grid-template-rows: repeat(19, 1fr);
+  width: 230px;
+  height: 175px;
+  transform-origin: center;
+  transition: transform 680ms cubic-bezier(0.22, 1, 0.36, 1), opacity 220ms ease;
+}
+
+.pigeon1 { left: 2%; top: 24%; transform: rotate(-5deg); }
+.pigeon2 { left: 36%; top: 4%; width: 250px; height: 190px; transform: rotate(2deg); }
+.pigeon3 { right: 1%; top: 34%; width: 210px; height: 160px; opacity: 0.72; transform: rotate(7deg); }
+
+.flock:hover .pigeon1 { transform: translate(5px, -3px) rotate(-7deg); }
+.flock:hover .pigeon2 { transform: translate(8px, -5px) rotate(0deg); }
+.flock:hover .pigeon3 { transform: translate(4px, -2px) rotate(5deg); }
+
+.flock:hover .wing {
+  animation: wingBlink 620ms ease-out 1;
+}
+
+@keyframes wingBlink {
+  0% { opacity: 1; }
+  30% { opacity: 0.55; }
+  48% { opacity: 1; }
+  72% { opacity: 0.72; }
+  100% { opacity: 1; }
+}
+
+@media(max-width: 700px) {
+  .flock { min-height: 340px; }
+  .pigeon { width: 170px; height: 130px; }
+  .pigeon2 { width: 185px; height: 140px; }
+  .pigeon3 { width: 155px; height: 118px; }
+}
+
+@media(max-width: 640px) {
+  .dot {
+    width: 3px;
+    height: 3px;
+  }
+}
+
+@media(prefers-reduced-motion: reduce) {
+  .wrap *, .matrix, .starHot, .pigeon, .wing, .flock * {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+  }
+}
