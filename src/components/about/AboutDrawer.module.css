@@ -247,49 +247,220 @@
   line-height: 1.6;
 }
 
-/* ─── Experience Rows ─── */
-.experienceList {
+/* ─── PATH Rows ─── */
+.pathList {
   display: flex;
   flex-direction: column;
-  gap: 32px;
 }
 
-.experienceRow {
-  display: flex;
-  gap: 16px;
-  align-items: flex-start;
+.pathRow {
+  display: grid;
+  grid-template-columns: 48px minmax(0,1fr) auto;
+  column-gap: 16px;
+  row-gap: 0px;
+  align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid #202020;
+  transition: all 200ms ease;
 }
 
-.expDetails {
-  flex: 1;
+.pathRow:last-child,
+.noBorderBottom {
+  border-bottom: none;
 }
 
-.expHeader {
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 4px;
+.pathRow:hover .pathCompany {
+  color: #fff;
 }
 
-.company {
-  font-weight: 500;
-  color: var(--text-primary, #fff);
-  letter-spacing: -0.01em;
+.pathDetails {
+  display: contents;
 }
 
-.period {
-  font-family: var(--font-geist-mono), monospace;
+.pathHeader {
+  display: contents; /* Allows period to sit in the auto column of the grid */
+}
+
+.pathCompany {
+  font-size: 16px;
+  font-weight: 600;
+  color: #fff;
+  line-height: 1.2;
+  letter-spacing: -0.018em;
+  transition: color 200ms ease;
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.pathPeriod {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
   font-size: 10px;
-  color: var(--text-muted, #888);
+  color: #aaa;
+  letter-spacing: .045em;
+  white-space: nowrap;
+  text-align: right;
+  grid-column: 3;
+  grid-row: 1;
 }
 
-.role {
+.pathRole {
+  margin-top: 5px;
   font-size: 13px;
-  color: var(--text-muted, #888);
+  color: #ccc;
+  line-height: 1.4;
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.pathDesc {
+  margin: 7px 0 0 0;
+  font-size: 13px;
+  color: #888;
+  line-height: 1.5;
+  grid-column: 2;
+  grid-row: 3;
+}
+
+.educationRow .pathCompany {
+  color: #eee;
+}
+
+.educationRow .pathRole {
+  color: #aaa;
+}
+
+.pathLogoContainer {
+  width: 44px;
+  height: 44px;
+  background: transparent;
+  border-radius: 6px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  transition: background 200ms ease;
+  grid-column: 1;
+  grid-row: 1 / span 3;
+}
+
+.pathRow:hover .pathLogoContainer {
+  background: transparent;
+}
+
+.pathLogo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.pathLogoFallback {
+  color: #555;
+  font-size: 16px;
+  font-weight: 500;
+}
+
+/* ─── Internships ─── */
+.internshipsHeader {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 10px;
+  text-transform: uppercase;
+  color: #888;
+  letter-spacing: .08em;
+  margin-top: 16px;
   margin-bottom: 8px;
 }
 
-.expDesc {
-  margin: 0;
+.internshipsHeader::after {
+  content: "";
+  flex-grow: 1;
+  height: 1px;
+  background: #333;
+  margin-left: 12px;
+}
+
+.internshipRow {
+  display: grid;
+  grid-template-columns: 36px minmax(0,1fr) auto;
+  column-gap: 12px;
+  row-gap: 0px;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #1a1a1a;
+}
+
+.internshipRow:last-child {
+  border-bottom: none;
+}
+
+.internshipLogoContainer {
+  width: 32px;
+  height: 32px;
+  background: transparent;
+  border-radius: 4px;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  transition: background 200ms ease;
+  grid-column: 1;
+  grid-row: 1 / span 2;
+}
+
+.internshipRow:hover .internshipLogoContainer {
+  background: transparent;
+}
+
+.internshipRow:hover .internshipCompany {
+  color: #fff;
+}
+
+.internshipLogo {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.internshipLogoFallback {
+  color: #555;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.internshipDetails {
+  display: contents;
+}
+
+.internshipHeader {
+  display: contents;
+}
+
+.internshipCompany {
+  font-size: 14px;
+  font-weight: 500;
+  color: #eee;
+  letter-spacing: -0.01em;
+  transition: color 200ms ease;
+  grid-column: 2;
+  grid-row: 1;
+}
+
+.internshipPeriod {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 10px;
+  color: #aaa;
+  letter-spacing: .04em;
+  white-space: nowrap;
+  text-align: right;
+  grid-column: 3;
+  grid-row: 1;
+}
+
+.internshipRole {
+  font-size: 12px;
+  color: #aaa;
+  grid-column: 2;
+  grid-row: 2;
 }
 
 /* ─── Work Rows ─── */
@@ -446,5 +617,23 @@
   }
   .linkSubtext {
     display: none;
+  }
+
+  /* Responsive PATH grids */
+  .pathRow {
+    grid-template-columns: 48px minmax(0, 1fr);
+  }
+  .internshipRow {
+    grid-template-columns: 36px minmax(0, 1fr);
+  }
+  .pathPeriod, .internshipPeriod {
+    grid-column: 2;
+    grid-row: 1;
+    justify-self: end;
+    text-align: right;
+    padding-top: 2px;
+  }
+  .pathCompany, .internshipCompany {
+    padding-right: 80px; /* Avoid overlap with absolute date equivalent */
   }
 }

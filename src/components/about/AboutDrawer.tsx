@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import styles from "./AboutDrawer.module.css";
 import { sound } from "../../sounds";
@@ -9,11 +9,11 @@ import { LocationMap } from "./LocationMap";
 import { 
   intro, 
   currently, 
+  locations,
   howIBuild, 
-  experience, 
+  pathData, 
   projects, 
   stats, 
-  education, 
   awards, 
   links 
 } from "../../data/about";
@@ -235,52 +235,65 @@ export function AboutDrawer() {
             <LocationMap />
           </Section>
 
-          {/* HOW I BUILD */}
-          <Section label="How I Build" id="build">
-            <p>{howIBuild.text}</p>
-          </Section>
 
-          {/* EXPERIENCE */}
-          <Section label="Experience" id="experience">
-            <div className={styles.experienceList}>
-              {experience.map((exp, i) => (
-                <div key={i} className={styles.experienceRow}>
-                  <BrandIcon src={exp.logo} fallback={exp.company.charAt(0)} alt={exp.company} />
-                  <div className={styles.expDetails}>
-                    <div className={styles.expHeader}>
-                      <span className={styles.company}>{exp.company}</span>
-                      <span className={styles.period}>{exp.period}</span>
-                    </div>
-                    <div className={styles.role}>{exp.role}</div>
-                    <p className={styles.expDesc}>{exp.description}</p>
-                  </div>
-                </div>
-              ))}
+
+          {/* PATH */}
+          <Section label="PATH" id="path">
+            <div className={styles.pathList}>
+              {pathData.map((item, i) => {
+                const prevItem = pathData[i - 1];
+                const nextItem = pathData[i + 1];
+                const showInternshipHeader = item.type === "internship" && prevItem?.type !== "internship";
+                const isLastBeforeInternships = item.type !== "internship" && nextItem?.type === "internship";
+                const isLastInternship = item.type === "internship" && nextItem?.type !== "internship";
+
+                return (
+                  <React.Fragment key={i}>
+                    {showInternshipHeader && (
+                      <div className={styles.internshipsHeader}>EARLY INTERNSHIPS</div>
+                    )}
+                    {item.type === "internship" ? (
+                      <div className={`${styles.internshipRow} ${isLastInternship ? styles.noBorderBottom : ''}`}>
+                        <div className={styles.internshipLogoContainer}>
+                          {item.logo ? (
+                            <img src={item.logo} alt={`${item.company} logo`} className={styles.internshipLogo} />
+                          ) : (
+                            <div className={styles.internshipLogoFallback}>{item.company.charAt(0)}</div>
+                          )}
+                        </div>
+                        <div className={styles.internshipDetails}>
+                          <div className={styles.internshipHeader}>
+                            <span className={styles.internshipCompany}>{item.company}</span>
+                            <span className={styles.internshipPeriod}>{item.period}</span>
+                          </div>
+                          <div className={styles.internshipRole}>{item.role}</div>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className={`${styles.pathRow} ${item.type === 'education' ? styles.educationRow : ''} ${isLastBeforeInternships ? styles.noBorderBottom : ''}`}>
+                        <div className={styles.pathLogoContainer}>
+                          {item.logo ? (
+                            <img src={item.logo} alt={`${item.company} logo`} className={styles.pathLogo} />
+                          ) : (
+                            <div className={styles.pathLogoFallback}>{item.company.charAt(0)}</div>
+                          )}
+                        </div>
+                        <div className={styles.pathDetails}>
+                          <div className={styles.pathHeader}>
+                            <span className={styles.pathCompany}>{item.company}</span>
+                            <span className={styles.pathPeriod}>{item.period}</span>
+                          </div>
+                          <div className={styles.pathRole}>{item.role}</div>
+                          {item.description && <p className={styles.pathDesc}>{item.description}</p>}
+                        </div>
+                      </div>
+                    )}
+                  </React.Fragment>
+                );
+              })}
             </div>
           </Section>
 
-          {/* SELECTED WORK */}
-          <Section label="Selected Work" id="work">
-            <div className={styles.workList}>
-              {projects.map((proj, i) => (
-                <div key={i} className={styles.workRow}>
-                  <BrandIcon src={proj.icon} fallback={proj.name.charAt(0)} alt={proj.name} />
-                  <div className={styles.workDetails}>
-                    <div className={styles.workName}>
-                      {proj.href ? (
-                        <a href={proj.href} target="_blank" rel="noopener noreferrer">
-                          {proj.name} ↗
-                        </a>
-                      ) : (
-                        proj.name
-                      )}
-                    </div>
-                    <div className={styles.workDesc}>{proj.descriptor}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Section>
 
           {/* IN NUMBERS */}
           <Section label="In Numbers" id="numbers">
@@ -294,37 +307,7 @@ export function AboutDrawer() {
             </div>
           </Section>
 
-          {/* EDUCATION */}
-          <Section label="Education" id="education">
-             <div className={styles.experienceList}>
-              {education.map((edu, i) => (
-                <div key={i} className={styles.experienceRow}>
-                  <BrandIcon src={edu.logo} fallback={edu.institution.charAt(0)} alt={edu.institution} />
-                  <div className={styles.expDetails}>
-                    <div className={styles.expHeader}>
-                      <span className={styles.company}>{edu.institution}</span>
-                      <span className={styles.period}>{edu.period}</span>
-                    </div>
-                    <div className={styles.role}>{edu.degree}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Section>
 
-          {/* SELECTED WINS */}
-          <Section label="Selected Wins" id="wins">
-             <div className={styles.workList}>
-              {awards.map((award, i) => (
-                <div key={i} className={styles.workRow}>
-                  <div className={styles.workDetails}>
-                    <div className={styles.workName}>{award.name}</div>
-                    <div className={styles.workDesc}>{award.details}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </Section>
 
           {/* ELSEWHERE */}
           <Section label="Elsewhere" id="elsewhere">

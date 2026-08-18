@@ -48,36 +48,99 @@ export const howIBuild = {
   text: "I prioritize speed, reliability, and aesthetics. My technical foundation spans Next.js, Node, Python, and cloud infrastructure, but I am language-agnostic when solving hard problems.",
 };
 
-export const experience = [
+export type PathEntry = {
+  company: string;
+  role: string;
+  period: string;
+  description?: string;
+  logo: string;
+  type: "main" | "education" | "internship";
+};
+
+export const pathData: PathEntry[] = [
+  {
+    company: "Alif",
+    role: "Founder & AI Engineer",
+    period: "NOW",
+    logo: "/alif-logo.svg",
+    type: "main",
+  },
   {
     company: "BeonAI",
-    role: "Founder & AI Engineer",
-    period: "2025—NOW",
-    description:
-      "Building an advanced provider-agnostic LLM interface with robust tooling.",
-    logo: "/brands/beonai.svg",
+    role: "Founder & AI Systems Engineer",
+    period: "2025",
+    logo: "/beonai-logo.svg",
+    type: "main",
   },
   {
     company: "Paper Pilot",
-    role: "Software Engineer",
-    period: "2023—2024",
-    description:
-      "Architected core platform features and streamlined infrastructure.",
-    logo: "/brands/paper-pilot.svg",
+    role: "Founder · CEO · Founding Engineer",
+    period: "MAR 2024 — SEP 2025",
+    logo: "/paperpilot-logo.png",
+    type: "main",
+  },
+  {
+    company: "University of Texas at Arlington",
+    role: "M.S. Information Technology",
+    period: "JAN 2024 — DEC 2025",
+    logo: "/uta-logo.png",
+    type: "education",
   },
   {
     company: "Gutenberg",
-    role: "Full Stack Developer",
-    period: "2022—2023",
-    description: "Developed and shipped high-performance web applications.",
-    logo: "/brands/gutenberg.svg",
+    role: "Full Stack Engineer",
+    period: "JAN 2023 — MAR 2024",
+    logo: "/gutenberg-logo.png",
+    type: "main",
+  },
+  {
+    company: "Basketo Finance",
+    role: "Founder · Founding Engineer",
+    period: "MAR 2022 — DEC 2022",
+    logo: "/basketo-logo.png",
+    type: "main",
   },
   {
     company: "Tecnotree",
+    role: "Frontend Developer · Full Stack Engineer",
+    period: "JUN 2021 — DEC 2022",
+    logo: "/tecnotree-logo.jpeg",
+    type: "main",
+  },
+  {
+    company: "Futurize Digital",
+    role: "Full Stack Developer",
+    period: "NOV 2020 — MAY 2021",
+    logo: "", // Missing logo
+    type: "internship",
+  },
+  {
+    company: "Prodjar",
+    role: "Full Stack Engineer",
+    period: "JUN 2020 — OCT 2020",
+    logo: "/prodjar-logo.jpeg",
+    type: "internship",
+  },
+  {
+    company: "SPI Cinemas",
     role: "Software Engineer",
-    period: "2021—2022",
-    description: "Maintained enterprise-scale telecommunications software.",
-    logo: "/brands/tecnotree.svg",
+    period: "DEC 2018 — MAY 2019",
+    logo: "/spi-logo.png",
+    type: "internship",
+  },
+  {
+    company: "RebelBase",
+    role: "Junior Software Engineer",
+    period: "JUL 2018 — DEC 2018",
+    logo: "/rebelbase-logo.jpeg",
+    type: "internship",
+  },
+  {
+    company: "Dr. M.G.R. Educational & Research Institute",
+    role: "B.Tech. Computer Science",
+    period: "2017 — 2021",
+    logo: "/mgr-logo.jpeg",
+    type: "education",
   },
 ];
 
@@ -109,23 +172,11 @@ export const stats = [
   { value: "300K+", label: "LLM prompts evaluated" },
   { value: "50K+", label: "research answers / day" },
   { value: "5K+", label: "npm downloads" },
-  { value: "3×", label: "hackathon wins" },
+  { value: "6×", label: "hackathon wins" },
   { value: "$31K+", label: "hackathon prizes" },
 ];
 
-export const education = [
-  {
-    institution: "University of Texas at Arlington",
-    degree: "M.S. Information Systems",
-    period: "2024–2025",
-    logo: "/brands/uta.svg",
-  },
-  {
-    institution: "Dr. MGR Educational & Research Institute",
-    degree: "B.Tech. Computer Science",
-    period: "2017–2021",
-  },
-];
+
 
 export const awards = [
   {
