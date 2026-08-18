@@ -217,7 +217,8 @@
   cursor: pointer;
 }
 
-.bioLink .label {
+.bioLink .label,
+.titleInline .label {
   display: inline;
   opacity: 0.94;
   transition:
@@ -229,6 +230,13 @@
 /* Calm game-menu hover */
 .bioLink:hover .label,
 .bioLink:focus-visible .label {
+  animation: menuBlink 520ms ease-out 1;
+  color: #fff;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.10);
+}
+
+.titleInline:hover .label,
+.titleInline:focus-visible .label {
   animation: menuBlink 520ms ease-out 1;
   color: #fff;
   text-shadow: 0 0 10px rgba(255, 255, 255, 0.10);

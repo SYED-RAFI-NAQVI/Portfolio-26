@@ -66,12 +66,12 @@ export default function Home() {
           <TimeBasedCelestial />
         </div>
         <h1 className={styles.bio}>
-          <span className={styles.titleInline} data-hover-sound="ambient">
-            <span>Rafi</span>
+          <a href="#about" className={styles.titleInline} data-hover-sound="ambient" style={{ textDecoration: 'none' }}>
+            <span className={styles.label}>Rafi</span>
             <span className={styles.waveInline} aria-label="smiling">
               😊😊
             </span>
-          </span>{" "}
+          </a>{" "}
           <span className={styles.soft}>builds</span>{" "}
           <Link className={styles.bioLink} href="/work?filter=ai" data-sfx="ai" data-hover-sound="ambient">
             <span className={styles.label}>AI products</span>
