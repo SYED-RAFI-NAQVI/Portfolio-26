@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import styles from "./AboutDrawer.module.css";
 import { sound } from "../../sounds";
 import { BrandIcon } from "./BrandIcon";
+import { LocationMap } from "./LocationMap";
 import { 
   intro, 
   currently, 
@@ -197,17 +198,41 @@ export function AboutDrawer() {
         <div className={styles.scrollContent} ref={scrollRef}>
           {/* INTRO */}
           <section className={styles.introSection}>
-            <img src="/rafi.png" alt="Rafi" className={styles.introAvatar} />
-            <div className={styles.introText}>
-              <h1 className={styles.name}>{intro.name}</h1>
-              <h2 className={styles.title}>{intro.title}</h2>
-              <p className={styles.bio}>{intro.bio}</p>
+            <div className={styles.introTop}>
+              <img src="/Rafi_about.png" alt="Rafi" className={styles.introAvatar} />
+              <div className={styles.introText}>
+                <h1 className={styles.name}>{intro.name}</h1>
+                <h2 className={styles.title}>{intro.title}</h2>
+              </div>
+            </div>
+            
+            <div className={styles.bioWrapper}>
+              {intro.bio.map((paragraph, i) => (
+                <p key={i} className={styles.bio}>{paragraph}</p>
+              ))}
             </div>
           </section>
 
           {/* CURRENTLY */}
           <Section label="Currently" id="currently">
-            <p>{currently.text}</p>
+            <div className={styles.currentlyList}>
+              {currently.map((item, i) => (
+                <div key={i} className={styles.currentlyRow}>
+                  <div className={styles.currentlyContent}>
+                    <div className={styles.currentlyHeader}>
+                      <span className={styles.currentlyName}>{item.name}</span>
+                      <span className={styles.currentlyStatus}>{item.status}</span>
+                    </div>
+                    <p className={styles.currentlyDesc}>{item.description}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </Section>
+
+          {/* LOCATION */}
+          <Section label="Location" id="location">
+            <LocationMap />
           </Section>
 
           {/* HOW I BUILD */}
