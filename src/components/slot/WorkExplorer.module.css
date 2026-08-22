@@ -1,0 +1,102 @@
+/* ═══ Work page shell ════════════════════════════════════════════════════════
+   Control column left, collection right. Each pane scrolls independently so
+   the machine and the collection never fight over one scrollbar.
+   ────────────────────────────────────────────────────────────────────────── */
+
+.split {
+  display: grid;
+  grid-template-columns: minmax(0, 40fr) minmax(0, 60fr);
+  gap: 24px;
+  align-items: stretch;
+  flex: 1;
+  min-height: 0;
+}
+
+/* Each pane scrolls on its own; the page itself never scrolls. The bars are
+   hidden in every engine — scrolling still works, it just leaves no gutter. */
+.control,
+.split > :last-child {
+  min-height: 0;
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: none;        /* Firefox */
+  -ms-overflow-style: none;     /* legacy Edge / IE */
+}
+
+.control::-webkit-scrollbar,
+.split > :last-child::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;                /* Chrome, Safari, Edge */
+}
+
+.control { min-width: 0; }
+
+.controlInner { padding-bottom: 40px; }
+
+/* ─── Back ───────────────────────────────────────────────────────────────── */
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 34px;
+  margin-bottom: 22px;
+  padding: 0 14px;
+  border: 1px solid var(--hairline);
+  background: var(--canvas-elevated);
+  color: var(--mute);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  text-decoration: none;
+  transition: color 150ms ease, border-color 150ms ease;
+}
+
+.back:hover { color: var(--ink); border-color: #3a3a3a; }
+.back:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
+
+.backArrow { transition: transform 180ms ease; }
+.back:hover .backArrow { transform: translateX(-3px); }
+
+/* Title and thesis in one line — the site's own voice, no serif. */
+.title {
+  margin: 0 0 30px;
+  max-width: 19ch;
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-size: 34px;
+  font-weight: 500;
+  line-height: 1.14;
+  letter-spacing: -1.3px;
+  color: var(--ink);
+}
+
+/* Second clause carries the ambition — same scale, stepped back in weight. */
+.titleNext { color: #6f7478; }
+
+.foot {
+  margin: 18px 0 0;
+  text-align: center;
+  font-family: var(--font-dot-gothic), monospace;
+  font-size: 10px;
+  line-height: 1;
+  letter-spacing: 0.22em;
+  text-indent: 0.22em;
+  color: #7d8286;
+}
+
+
+/* Below the split point the control stops being sticky and simply leads. */
+/* Below the split point the panes stack and the page scrolls as one again. */
+@media (max-width: 1180px) {
+  .split {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 32px;
+    flex: none;
+    overflow-y: auto;
+  }
+  .control,
+  .split > :last-child { overflow-y: visible; }
+}

@@ -57,11 +57,10 @@
 }
 
 .avatar {
-  border-radius: 4px;
-  object-fit: cover;
-  border: 1px solid var(--border-subtle);
-  background: var(--canvas-elevated);
+  border-radius: 0;
+  object-fit: contain;
   filter: brightness(1.1) contrast(1.05);
+  margin-left: -8px;
 }
 
 .nav {

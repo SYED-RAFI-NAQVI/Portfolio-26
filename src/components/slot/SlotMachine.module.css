@@ -1,0 +1,414 @@
+/* ═══ Project Hunter — cabinet ═══════════════════════════════════════════════
+   A real slot-machine silhouette: steel cabinet wrapped around a single
+   recessed 3×3 screen, with a lever on the right rail and a vertical throw.
+   Monochrome hardware; the single amber accent is the knob and the 3/3 hit.
+   ────────────────────────────────────────────────────────────────────────── */
+
+.wrap {
+  --amber:      #e9a944;
+  --amber-dim:  rgba(233, 169, 68, 0.14);
+  --well:       #050607;
+  --travel:     48px;   /* vertical distance the lever knob covers */
+
+  display: block;
+}
+
+/* ─── Rig: cabinet + lever rail ──────────────────────────────────────────── */
+
+.rig {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 42px;
+  align-items: center;
+  gap: 10px;
+}
+
+.rigSpinning .cabinet { animation: rigShake 90ms linear infinite; }
+
+@keyframes rigShake {
+  0%, 100% { transform: translate3d(0, 0, 0); }
+  50%      { transform: translate3d(0.4px, -0.4px, 0); }
+}
+
+/* ─── Cabinet shell ──────────────────────────────────────────────────────── */
+
+.cabinet {
+  position: relative;
+  padding: 10px;
+  border: 1px solid #000;
+  border-radius: 20px 20px 10px 10px;
+  background:
+    linear-gradient(180deg,
+      #33383c 0%,
+      #22262a 3%,
+      #171a1d 12%,
+      #121517 46%,
+      #0d1012 82%,
+      #1c2023 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.20),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.85),
+    0 2px 3px rgba(0, 0, 0, 0.7),
+    0 34px 74px -26px rgba(0, 0, 0, 0.95);
+}
+
+/* Rolled metal edges down both sides. */
+.cabinet::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.11) 0%,
+    rgba(255, 255, 255, 0.02) 3.5%,
+    transparent 12%,
+    transparent 88%,
+    rgba(255, 255, 255, 0.02) 96.5%,
+    rgba(255, 255, 255, 0.085) 100%
+  );
+}
+
+/* Fine brushed-metal grain. */
+.cabinet::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  opacity: 0.5;
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.016) 0px,
+    rgba(255, 255, 255, 0.016) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  mix-blend-mode: overlay;
+}
+
+/* ─── Screen: recessed glass holding the drums ───────────────────────────── */
+
+.screen {
+  position: relative;
+  z-index: 1;
+  padding: 8px;
+  border: 1px solid #000;
+  border-radius: 14px;
+  background: var(--well);
+  box-shadow:
+    inset 0 6px 18px rgba(0, 0, 0, 0.95),
+    inset 0 -2px 6px rgba(0, 0, 0, 0.8),
+    0 1px 0 rgba(255, 255, 255, 0.09);
+}
+
+.bezel {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.column { display: flex; flex-direction: column; min-width: 0; }
+
+.columnLabel {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 0 4px 8px;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: #5a5f63;
+}
+.columnCount { color: #34383b; letter-spacing: 0.08em; }
+
+/* ─── Reel window ─────────────────────────────────────────────────────────
+   Portrait: --item-h is derived from the rendered column width at the
+   artwork's 2:3 ratio and written inline by SlotMachine.tsx.
+   ────────────────────────────────────────────────────────────────────────── */
+
+.window {
+  --speed: 0;
+  position: relative;
+  height: var(--item-h, 240px);
+  overflow: hidden;
+  border: 1px solid #000;
+  border-radius: 0;
+  background: #050506;
+  box-shadow:
+    inset 0 3px 6px -4px rgba(0, 0, 0, 0.6),
+    inset 0 -3px 6px -4px rgba(0, 0, 0, 0.6);
+}
+
+.strip {
+  position: relative;
+  z-index: 1;
+  will-change: transform, filter;
+}
+
+/* A reel face: artwork when the value has a card, a dot-matrix plate when it
+   doesn't. Both share the same ground so a partial art set still reads. */
+.face {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  overflow: hidden;
+  background: #050506;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  filter: brightness(1.22) contrast(1.06);
+  transition: filter 300ms ease;
+}
+
+/* Faces dim only while the drums are moving — at rest the card sits at full
+   brightness instead of being held at 62%. */
+.rigSpinning .face { filter: brightness(0.78) contrast(1.06); }
+
+.faceLanded { filter: brightness(1.32) contrast(1.08); }
+
+.faceArt {
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Fallback ground: stipple to echo the artwork's dither. */
+.faceGlyph {
+  position: absolute;
+  inset: 0;
+  background:
+    radial-gradient(85% 60% at 50% 32%, rgba(255, 255, 255, 0.07) 0%, transparent 70%),
+    repeating-radial-gradient(
+      circle at 50% 50%,
+      rgba(255, 255, 255, 0.05) 0px,
+      rgba(255, 255, 255, 0.05) 1px,
+      transparent 1px,
+      transparent 4px
+    );
+}
+
+
+/* Payline — a frame around the single visible face. */
+.payline {
+  position: absolute;
+  z-index: 3;
+  inset: 0;
+  pointer-events: none;
+  border-radius: 0;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+  transition: box-shadow 260ms ease;
+}
+
+.window[data-locked="true"] .payline {
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.22),
+    inset 0 0 26px rgba(255, 255, 255, 0.05);
+}
+
+/* Motion streaks — opacity tracks live reel velocity via --speed. */
+.streaks {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  opacity: calc(var(--speed) * 0.5);
+  background: repeating-linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.10) 0px,
+    rgba(255, 255, 255, 0.10) 1px,
+    transparent 1px,
+    transparent 5px
+  );
+}
+
+/* Glass. */
+.glare {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  pointer-events: none;
+  border-radius: 6px;
+  background: linear-gradient(
+    118deg,
+    rgba(255, 255, 255, 0.06) 0%,
+    rgba(255, 255, 255, 0.014) 26%,
+    transparent 52%
+  );
+}
+
+/* ─── Lever rail — vertical throw ────────────────────────────────────────── */
+
+.leverColumn {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 9px;
+  padding: 12px 0;
+  border: 1px solid #000;
+  border-radius: 12px 12px 10px 10px;
+  background: linear-gradient(180deg, #2e3336 0%, #1a1d20 10%, #121417 60%, #0c0e10 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.18),
+    inset 0 -2px 0 rgba(0, 0, 0, 0.8),
+    0 34px 74px -26px rgba(0, 0, 0, 0.95);
+}
+
+.leverRig {
+  --pull: 0;
+  position: relative;
+  width: 32px;
+  height: 150px;
+  flex: none;
+}
+
+/* Housing bolted to the rail — the shaft disappears into this. */
+.leverMount {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 26px;
+  height: 18px;
+  border-radius: 4px;
+  background: linear-gradient(180deg, #4b5257 0%, #2b3034 38%, #14171a 100%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.34),
+    inset 0 -2px 4px rgba(0, 0, 0, 0.75),
+    0 3px 8px rgba(0, 0, 0, 0.8);
+}
+
+/* Channel the shaft slides through — overflow clips it into the housing. */
+.leverSlot {
+  position: absolute;
+  bottom: 13px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 9px;
+  height: 112px;
+  overflow: hidden;
+  border-radius: 9px 9px 0 0;
+  background: linear-gradient(180deg, #000 0%, #050607 40%, #000 100%);
+  box-shadow:
+    inset 0 0 6px rgba(0, 0, 0, 0.95),
+    inset 1px 0 0 rgba(255, 255, 255, 0.05),
+    inset -1px 0 0 rgba(255, 255, 255, 0.03);
+}
+
+.leverShaft {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 6px;
+  height: 100%;
+  border-radius: 5px;
+  transform: translateX(-50%) translateY(calc(var(--pull) * var(--travel)));
+  transition: transform 140ms linear;
+  background: linear-gradient(
+    90deg,
+    #1b1e21 0%, #6e767c 24%, #c3cace 46%, #757d83 66%, #191c1f 100%
+  );
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.7);
+}
+
+/* The button is the whole grab area; only the knob is painted. */
+.lever {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: calc(26px + var(--travel));
+  padding: 0;
+  border: none;
+  background: none;
+  cursor: grab;
+  touch-action: none;
+}
+.lever:disabled { cursor: default; }
+.leverGrabbed .lever { cursor: grabbing; }
+.lever:focus-visible { outline: none; }
+
+.leverKnob {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  transform: translateX(-50%) translateY(calc(var(--pull) * var(--travel)));
+  transition: transform 140ms linear;
+  background: radial-gradient(
+    circle at 34% 27%,
+    #ffe0a4 0%, #f6bd63 26%, var(--amber) 46%, #a86f1c 78%, #5f3c0a 100%
+  );
+  box-shadow:
+    inset 0 3px 7px rgba(255, 255, 255, 0.45),
+    inset 0 -6px 11px rgba(0, 0, 0, 0.5),
+    0 5px 16px rgba(233, 169, 68, 0.22),
+    0 3px 6px rgba(0, 0, 0, 0.75);
+}
+
+/* Sprung return — overshoots past rest, then settles. */
+.leverFired .leverShaft,
+.leverFired .leverKnob {
+  transition: transform 620ms cubic-bezier(0.16, 1.5, 0.34, 1);
+}
+
+.lever:focus-visible + .leverKnob,
+.lever:focus-visible .leverKnob {
+  box-shadow:
+    0 0 0 2px #0c0e10,
+    0 0 0 4px #f2f4f5,
+    inset 0 3px 7px rgba(255, 255, 255, 0.45),
+    inset 0 -6px 11px rgba(0, 0, 0, 0.5);
+}
+
+.leverHint {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 8px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: #4b5054;
+  text-align: center;
+}
+
+/* ─── Responsive ─────────────────────────────────────────────────────────── */
+
+@media (max-width: 860px) {
+  .wrap { --travel: 52px; }
+
+  .rig { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+
+  .leverColumn {
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    gap: 22px;
+    padding: 18px 24px;
+    border-radius: 12px;
+  }
+  .leverRig { width: 44px; height: 112px; }
+  .leverMount { width: 38px; height: 22px; }
+  .leverSlot { bottom: 16px; height: 82px; }
+  .leverKnob { width: 28px; height: 28px; }
+
+  .bezel { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
+  .cabinet { border-radius: 18px 18px 10px 10px; }
+}
+
+@media (max-width: 520px) {
+  .cabinet { padding: 8px; }
+  .screen { padding: 6px; }
+}
+
+/* ─── Reduced motion ─────────────────────────────────────────────────────── */
+
+@media (prefers-reduced-motion: reduce) {
+  .rigSpinning .cabinet { animation: none; }
+  .streaks { display: none; }
+  .face { transition: none; }
+  .leverShaft,
+  .leverKnob { transition-duration: 60ms; }
+}

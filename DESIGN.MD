@@ -4,7 +4,7 @@
 
 Rafi's portfolio uses a **dark-first, minimal, technical design system** inspired by the restraint and precision of Vercel's Geist visual language.
 
-The portfolio should feel:
+The portfolio should feel:9
 
 - intelligent
 - technical

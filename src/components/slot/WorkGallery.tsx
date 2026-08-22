@@ -1,0 +1,315 @@
+"use client";
+
+import Image from "next/image";
+import { useLayoutEffect, useMemo, useRef } from "react";
+import styles from "./WorkGallery.module.css";
+import { AlifArt } from "./art/AlifArt";
+import Link from "next/link";
+import {
+  rankProjects,
+  type Combo,
+  type Match,
+  type ProjectLinkKind,
+  type SpinResult,
+} from "../../data/slot";
+
+/**
+ * The work collection.
+ *
+ * Every project stays mounted at all times; a spin re-orders and de-emphasises
+ * rather than filtering, so the gallery never flashes empty. Reordering is
+ * animated with FLIP — measure, reorder, invert, play — so cards visibly
+ * travel to their new rank instead of snapping.
+ */
+
+function useFlip(order: string[]) {
+  const nodes = useRef(new Map<string, HTMLElement>());
+  const prev = useRef(new Map<string, DOMRect>());
+
+  const register = (id: string) => (el: HTMLElement | null) => {
+    if (el) nodes.current.set(id, el);
+    else nodes.current.delete(id);
+  };
+
+  useLayoutEffect(() => {
+    const animate = !window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    nodes.current.forEach((el, id) => {
+      const before = prev.current.get(id);
+      const after = el.getBoundingClientRect();
+
+      if (before && animate) {
+        const dx = before.left - after.left;
+        const dy = before.top - after.top;
+        if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) {
+          el.animate(
+            [{ transform: `translate(${dx}px, ${dy}px)` }, { transform: "none" }],
+            { duration: 560, easing: "cubic-bezier(0.2, 0.85, 0.25, 1)" },
+          );
+        }
+      }
+      // This render's geometry is the next change's "before".
+      prev.current.set(id, after);
+    });
+  }, [order]);
+
+  return register;
+}
+
+/**
+ * Coded card artwork, keyed by project id.
+ *
+ * These are flat vector layouts — brand colour, type, a logo — so drawing them
+ * in SVG beats generating a PNG: exact brand values, the real logo file, crisp
+ * at any card width, and editable in place.
+ */
+const ART: Record<string, React.ComponentType> = {
+  alif: AlifArt,
+};
+
+/**
+ * Compose the row layout for one render.
+ *
+ * A row is only ever [5] or [3,2] or [2,3] — never two equal halves, never
+ * more than two cards. The sequence is picked from a seed derived from the
+ * landed combination, so every spin lays the grid out differently and no
+ * project is locked to one width. Same combination always yields the same
+ * layout, so a re-render doesn't reshuffle underneath the FLIP animation.
+ */
+function buildSpans(count: number, seed: number): number[] {
+  let state = (seed || 1) >>> 0;
+  const rand = () => {
+    state = (state * 1664525 + 1013904223) >>> 0;
+    return state / 4294967296;
+  };
+
+  const spans: number[] = [];
+  let sinceFull = 0;
+
+  while (spans.length < count) {
+    const remaining = count - spans.length;
+
+    if (remaining === 1) {
+      spans.push(5);
+      break;
+    }
+
+    const roll = rand();
+    // Force a full-width row if we have gone too long without one, so the
+    // rhythm never flattens into an unbroken run of pairs.
+    if (sinceFull >= 3 || roll < 0.2) {
+      spans.push(5);
+      sinceFull = 0;
+    } else {
+      spans.push(...(roll < 0.6 ? [3, 2] : [2, 3]));
+      sinceFull += 1;
+    }
+  }
+
+  return spans.slice(0, count);
+}
+
+/** Cheap string hash, so a combination maps to a stable layout seed. */
+function seedFrom(parts: string[]): number {
+  return parts.join("|").split("").reduce((h, c) => (h * 31 + c.charCodeAt(0)) >>> 0, 7);
+}
+
+const LINK_LABEL: Record<ProjectLinkKind, string> = {
+  "case-study": "Case study",
+  live: "Live",
+  play: "Play",
+};
+
+function Card({
+  match,
+  combo,
+  active,
+  span,
+  register,
+}: {
+  match: Match;
+  combo: Combo | null;
+  active: boolean;
+  span: number;
+  register: (el: HTMLElement | null) => void;
+}) {
+  const { project, matched, score } = match;
+
+  const skillHit = combo?.skill ?? null;
+
+  // Whatever caused the hit floats to the front of each tag row.
+  const skills =
+    matched.skill && skillHit
+      ? [skillHit, ...project.skills.filter((s) => s !== skillHit)]
+      : project.skills;
+  const shown = skills.slice(0, 4);
+
+  const types = matched.type
+    ? [combo!.type, ...project.type.filter((t) => t !== combo!.type)]
+    : project.type;
+  const domains = matched.domain
+    ? [combo!.domain, ...project.domain.filter((d) => d !== combo!.domain)]
+    : project.domain;
+
+  const Art = ART[project.id];
+
+  return (
+    <article
+      ref={register}
+      className={styles.card}
+      data-score={score}
+      data-dim={active && score === 0 ? "true" : "false"}
+      data-feature={score === 3 ? "true" : "false"}
+      data-cover={Art || project.cover ? "true" : "false"}
+      data-linked={project.links?.length ? "true" : "false"}
+      style={{ gridColumn: `span ${span}` }}
+    >
+      {Art ? (
+        <div className={styles.cover}>
+          <Art />
+        </div>
+      ) : (
+        project.cover && (
+          <div className={styles.cover} aria-hidden="true">
+            <Image
+              src={project.cover}
+              alt=""
+              fill
+              sizes="(max-width: 1180px) 90vw, 420px"
+              className={styles.coverImg}
+            />
+          </div>
+        )
+      )}
+
+      <div className={styles.body}>
+      <div className={styles.cardHead}>
+        {project.logo ? (
+          <Image
+            src={project.logo}
+            alt=""
+            width={30}
+            height={30}
+            className={styles.logo}
+          />
+        ) : (
+          <span className={styles.logoFallback} aria-hidden="true">
+            {project.name.slice(0, 2).toUpperCase()}
+          </span>
+        )}
+
+        <div className={styles.cardIdent}>
+          <h2 className={styles.name}>{project.name}</h2>
+          <p className={styles.role}>{project.role}</p>
+        </div>
+
+        <span className={styles.year}>{project.period}</span>
+
+        {score > 0 && (
+          <span className={styles.scorePip} data-score={score}>
+            {score}/3
+          </span>
+        )}
+      </div>
+
+      {!project.cover && <p className={styles.blurb}>{project.blurb}</p>}
+
+      <div className={styles.tags}>
+        {types.map((t) => (
+          <span
+            key={t}
+            className={`${styles.tag} ${
+              matched.type && t === combo?.type ? styles.tagHit : ""
+            }`}
+          >
+            {t}
+          </span>
+        ))}
+        {domains.map((d) => (
+          <span
+            key={d}
+            className={`${styles.tag} ${
+              matched.domain && d === combo?.domain ? styles.tagHit : ""
+            }`}
+          >
+            {d}
+          </span>
+        ))}
+        {shown.map((s) => (
+          <span
+            key={s}
+            className={`${styles.tag} ${styles.tagSkill} ${
+              matched.skill && s === skillHit ? styles.tagHit : ""
+            }`}
+          >
+            {s}
+          </span>
+        ))}
+        {project.skills.length > shown.length && (
+          <span className={`${styles.tag} ${styles.tagMore}`}>
+            +{project.skills.length - shown.length}
+          </span>
+        )}
+      </div>
+
+      {project.links && project.links.length > 0 && (
+        <footer className={styles.cardFoot}>
+          {project.links.map((l, n) => (
+            <Link
+              key={l.kind}
+              className={styles.action}
+              href={l.href}
+              /* The first action stretches to cover the whole card. */
+              data-primary={n === 0 ? "true" : "false"}
+            >
+              {LINK_LABEL[l.kind]}
+              <span aria-hidden="true">→</span>
+            </Link>
+          ))}
+        </footer>
+      )}
+      </div>
+    </article>
+  );
+}
+
+export function WorkGallery({
+  result,
+  spinning,
+}: {
+  result: SpinResult | null;
+  spinning: boolean;
+}) {
+  const combo = result?.combo ?? null;
+  const ranked = useMemo(() => rankProjects(combo), [combo]);
+  const order = useMemo(() => ranked.map((m) => m.project.id), [ranked]);
+
+  // Re-composed on every spin, so widths move with the ranking.
+  const spans = useMemo(
+    () =>
+      buildSpans(
+        ranked.length,
+        combo ? seedFrom([combo.type, combo.domain, combo.skill]) : 7,
+      ),
+    [ranked.length, combo],
+  );
+
+  const register = useFlip(order);
+
+  return (
+    <section className={styles.collection} aria-label="Work">
+      <div className={styles.grid} data-spinning={spinning ? "true" : "false"}>
+        {ranked.map((m, i) => (
+          <Card
+            key={m.project.id}
+            match={m}
+            combo={combo}
+            active={!!result}
+            span={spans[i] ?? 3}
+            register={register(m.project.id)}
+          />
+        ))}
+      </div>
+    </section>
+  );
+}

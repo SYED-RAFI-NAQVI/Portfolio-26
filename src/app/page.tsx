@@ -21,10 +21,10 @@ export default function Home() {
         <div className={styles.avatarWrap}>
           <a href="#about">
             <Image 
-              src="/rafi_hi.png" 
-              alt="Rafi" 
-              width={64} 
-              height={64} 
+              src="/logo1.png" 
+              alt="Logo" 
+              width={36} 
+              height={36} 
               className={styles.avatar} 
             />
           </a>

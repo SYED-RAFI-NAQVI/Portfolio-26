@@ -1,5 +1,14 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono, DotGothic16 } from "next/font/google";
+import {
+  Geist,
+  Geist_Mono,
+  DotGothic16,
+  Doto,
+  Geist_Pixel,
+  Pixelify_Sans,
+  Raleway_Dots,
+  VT323,
+} from "next/font/google";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -12,10 +21,40 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+
 const dotGothic = DotGothic16({
   weight: "400",
   variable: "--font-dot-gothic",
   subsets: ["latin"],
+});
+
+/* ─── Pixel / display faces, available as CSS variables ──────────────────── */
+
+const doto = Doto({
+  variable: "--font-doto",
+  subsets: ["latin"],
+});
+
+const geistPixel = Geist_Pixel({
+  variable: "--font-geist-pixel",
+  subsets: ["latin"],
+});
+
+const pixelifySans = Pixelify_Sans({
+  variable: "--font-pixelify",
+  subsets: ["latin"],
+});
+
+const ralewayDots = Raleway_Dots({
+  variable: "--font-raleway-dots",
+  subsets: ["latin"],
+  weight: "400",
+});
+
+const vt323 = VT323({
+  variable: "--font-vt323",
+  subsets: ["latin"],
+  weight: "400",
 });
 
 export const metadata: Metadata = {
@@ -27,7 +66,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} ${dotGothic.variable} h-full antialiased`}
+      className={`${geistSans.variable} ${geistMono.variable} ${dotGothic.variable} ${doto.variable} ${geistPixel.variable} ${pixelifySans.variable} ${ralewayDots.variable} ${vt323.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">{children}</body>
     </html>

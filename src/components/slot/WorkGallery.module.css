@@ -1,0 +1,263 @@
+/* ═══ Work collection ════════════════════════════════════════════════════════
+   The machine's output surface. Everything stays mounted; a spin re-ranks
+   and de-emphasises rather than filtering.
+   ────────────────────────────────────────────────────────────────────────── */
+
+.collection {
+  --amber: #e9a944;
+  --amber-dim: rgba(233, 169, 68, 0.13);
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+/* ─── Grid ───────────────────────────────────────────────────────────────── */
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 1px;
+  background: #000;
+  border: 1px solid #000;
+  transition: opacity 220ms ease;
+}
+.grid[data-spinning="true"] { opacity: 0.5; }
+
+.card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  overflow: hidden;
+  /* Still black — depth comes from the gutters being darker than the card and
+     from a hairline catch-light on the top edge, not from a lighter grey fill. */
+  background: #0b0c0d;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  transition:
+    opacity 320ms ease,
+    filter 320ms ease,
+    background 180ms ease,
+    box-shadow 180ms ease;
+}
+
+.card:hover {
+  background: #101113;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.09);
+}
+
+/* De-emphasised, never removed — the collection stays legible as a whole. */
+.card[data-dim="true"] {
+  opacity: 0.34;
+  filter: grayscale(1);
+}
+.card[data-dim="true"]:hover { opacity: 0.75; filter: grayscale(0.4); }
+
+/* Five-column base so a pair can never split evenly. Spans are composed per
+   spin in WorkGallery.tsx and applied inline — rows are only ever [5], [3,2]
+   or [2,3], so no row is 50/50 and none holds more than two cards. */
+
+/* A 3/3 hit still reads as the hero of its slot. */
+.card[data-feature="true"] {
+  background: #0e0f11;
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.06),
+    inset 0 0 0 1px rgba(233, 169, 68, 0.16);
+}
+
+@media (max-width: 620px) {
+  .grid { grid-template-columns: minmax(0, 1fr); }
+  /* Overrides the inline span from the layout composer. */
+  .card { grid-column: 1 / -1 !important; }
+}
+
+/* Purpose-made project artwork, shown at the head of the card. */
+.cover {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  background: #08090b;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Coded artwork fills the cover box the same way an image would. */
+.cover > svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.coverImg {
+  object-fit: cover;
+  object-position: center;
+  transition: transform 600ms cubic-bezier(0.2, 0.85, 0.25, 1);
+}
+.card:hover .coverImg { transform: scale(1.03); }
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  flex: 1;
+  padding: 22px;
+}
+
+/* Artwork cards read as a unit, so the whole card lifts on hover. */
+.card[data-cover="true"]:hover { background: #101113; }
+
+.cardHead { display: flex; align-items: flex-start; gap: 13px; }
+
+.logo {
+  width: 30px;
+  height: 30px;
+  flex: none;
+  object-fit: contain;
+  border-radius: 5px;
+  background: var(--canvas-elevated);
+  border: 1px solid var(--hairline);
+}
+
+.logoFallback {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  flex: none;
+  border-radius: 5px;
+  border: 1px solid var(--hairline);
+  background: var(--canvas-elevated);
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 10px;
+  font-weight: 600;
+  color: var(--mute);
+}
+
+.cardIdent { min-width: 0; flex: 1; }
+
+.name {
+  margin: 0;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: -0.2px;
+  color: var(--ink);
+}
+
+.role {
+  margin: 4px 0 0;
+  font-size: 11px;
+  line-height: 15px;
+  color: var(--mute);
+}
+
+.scorePip {
+  flex: none;
+  padding: 3px 6px;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  color: var(--mute);
+  border: 1px solid var(--hairline);
+}
+.scorePip[data-score="3"] {
+  color: var(--amber);
+  border-color: rgba(233, 169, 68, 0.4);
+  background: var(--amber-dim);
+}
+
+.blurb {
+  margin: 0;
+  font-size: 13px;
+  line-height: 20px;
+  color: var(--body);
+}
+
+.tags { display: flex; flex-wrap: wrap; gap: 7px; margin-top: auto; }
+
+.tag {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 9px;
+  font-weight: 500;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  padding: 5px 9px;
+  color: #6b7074;
+  border: 1px solid var(--hairline);
+  transition: color 220ms ease, border-color 220ms ease, background 220ms ease;
+}
+.tagSkill { color: #55595d; border-color: var(--hairline-soft); }
+.tagMore { color: #3d4245; border-style: dashed; }
+
+.tagHit {
+  color: var(--amber);
+  border-color: rgba(233, 169, 68, 0.38);
+  background: var(--amber-dim);
+}
+
+.cardFoot {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 4px;
+  padding-top: 18px;
+  border-top: 1px solid var(--hairline-soft);
+}
+
+.year {
+  flex: none;
+  align-self: flex-start;
+  padding-top: 3px;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 9px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: #5a5f63;
+}
+
+/* Whole-card click target: the primary action's pseudo-element stretches to
+   the card's bounds, so clicking anywhere follows it. Kept as one real link
+   rather than a wrapper, so the card still exposes a single destination to
+   screen readers and text stays selectable. */
+.card[data-linked="true"] { cursor: pointer; }
+
+.action[data-primary="true"] { position: static; }
+.action[data-primary="true"]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+}
+
+.card:hover .action[data-primary="true"] {
+  color: var(--ink);
+  border-color: #3a3a3a;
+  background: rgba(255, 255, 255, 0.03);
+}
+.card:hover .action[data-primary="true"] span { transform: translateX(2px); }
+
+/* Internal destinations — case study, live build, playable demo. */
+.action {
+  position: relative;
+  z-index: 2;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 30px;
+  padding: 0 13px;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--mute);
+  text-decoration: none;
+  border: 1px solid var(--hairline);
+  transition: color 150ms ease, border-color 150ms ease, background 150ms ease;
+}
+.action:hover {
+  color: var(--ink);
+  border-color: #3a3a3a;
+  background: rgba(255, 255, 255, 0.03);
+}
+.action span { transition: transform 200ms ease; }
+.action:hover span { transform: translateX(2px); }
