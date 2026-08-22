@@ -36,21 +36,12 @@
 
 /* ─── Back ───────────────────────────────────────────────────────────────── */
 
-/* Back on the left, reset on the right — the margin that used to sit on the
-   link belongs to the row now, so the two stay on one baseline. */
-.topRow {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 12px;
-  margin-bottom: 22px;
-}
-
 .back {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   height: 34px;
+  margin-bottom: 22px;
   padding: 0 14px;
   border: 1px solid var(--hairline);
   background: var(--canvas-elevated);
@@ -66,29 +57,6 @@
 
 .back:hover { color: var(--ink); border-color: #3a3a3a; }
 .back:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
-
-.reset {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  height: 34px;
-  padding: 0 14px;
-  border: 1px solid var(--hairline);
-  background: var(--canvas-elevated);
-  color: var(--mute);
-  font-family: var(--font-geist-mono), monospace;
-  font-size: 10px;
-  font-weight: 600;
-  letter-spacing: 0.12em;
-  text-transform: uppercase;
-  cursor: pointer;
-  transition: color 150ms ease, border-color 150ms ease;
-}
-.reset:hover { color: var(--ink); border-color: #3a3a3a; }
-.reset:focus-visible { outline: 2px solid var(--ink); outline-offset: 2px; }
-
-.resetIcon { transition: transform 320ms ease; }
-.reset:hover .resetIcon { transform: rotate(-180deg); }
 
 .backArrow { transition: transform 180ms ease; }
 .back:hover .backArrow { transform: translateX(-3px); }

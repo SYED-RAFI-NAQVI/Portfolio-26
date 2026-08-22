@@ -63,9 +63,14 @@ function landingPosition(floorPos: number, targetIndex: number, n: number, itemH
 export function SlotMachine({
   onResolve,
   onSpinStart,
+  onReset,
+  canReset = false,
 }: {
   onResolve: (result: SpinResult) => void;
   onSpinStart: () => void;
+  /** Clears the spin. Rendered on the lever rail, above the lever itself. */
+  onReset?: () => void;
+  canReset?: boolean;
 }) {
   // The rAF loop closes over the first render's callbacks, so route props
   // through a ref to guarantee the gallery always gets the live handlers.
@@ -451,6 +456,20 @@ export function SlotMachine({
 
         {/* ─── Lever rail — vertical throw ─────────────────────────────── */}
         <div className={styles.leverColumn}>
+          {/* Reset sits on the rail rather than up with the page nav: it acts
+              on the machine, so it belongs on the machine. The rail centres
+              its stack, so adding this drops the lever slightly — which is
+              wanted, it gives the throw more room. */}
+          <button
+            type="button"
+            className={styles.reset}
+            onClick={onReset}
+            disabled={!canReset}
+            aria-label="Reset the reels and clear the spin"
+          >
+            <span aria-hidden="true">↺</span>
+          </button>
+
           <div
             className={styles.leverRig}
             ref={rigRef}

@@ -46,20 +46,10 @@ export function WorkExplorer() {
     <div className={styles.split}>
       <aside className={styles.control}>
         <div className={styles.controlInner}>
-          <div className={styles.topRow}>
-            <Link className={styles.back} href="/">
-              <span className={styles.backArrow} aria-hidden="true">←</span>
-              Back
-            </Link>
-
-            {/* Only offered once there is something to undo. */}
-            {result && (
-              <button type="button" className={styles.reset} onClick={onReset}>
-                <span className={styles.resetIcon} aria-hidden="true">↺</span>
-                Reset
-              </button>
-            )}
-          </div>
+          <Link className={styles.back} href="/">
+            <span className={styles.backArrow} aria-hidden="true">←</span>
+            Back
+          </Link>
 
           <h1 className={styles.title}>
             Everything I&apos;ve shipped since 2017.{" "}
@@ -68,7 +58,13 @@ export function WorkExplorer() {
             </span>
           </h1>
 
-          <SlotMachine key={machineKey} onResolve={onResolve} onSpinStart={onSpinStart} />
+          <SlotMachine
+            key={machineKey}
+            onResolve={onResolve}
+            onSpinStart={onSpinStart}
+            onReset={onReset}
+            canReset={result !== null}
+          />
 
           <p className={styles.foot}>DRAG THE KNOB DOWN</p>
         </div>
