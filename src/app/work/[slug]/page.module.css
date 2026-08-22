@@ -1,0 +1,129 @@
+/* ═══ Case study ═════════════════════════════════════════════════════════════
+   One column, generous measure. The gallery is dense by design; this is where
+   a project gets room.
+   ────────────────────────────────────────────────────────────────────────── */
+
+.page {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 40px 24px 120px;
+  display: flex;
+  flex-direction: column;
+  gap: 34px;
+}
+
+.back {
+  align-self: flex-start;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  color: #a8adb1;
+  text-decoration: none;
+  padding: 8px 12px;
+  border: 1px solid var(--hairline);
+  transition: color 150ms ease, border-color 150ms ease;
+}
+.back:hover { color: var(--ink); border-color: #3a3a3a; }
+
+.hero {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+.hero > svg { display: block; width: 100%; height: auto; aspect-ratio: 16 / 10; }
+.heroImg { object-fit: cover; }
+
+.head { display: flex; flex-direction: column; gap: 8px; }
+
+.name {
+  margin: 0;
+  font-size: 40px;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+.role { margin: 0; font-size: 15px; color: #c9c9c9; }
+.period {
+  margin: 0;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: #a8adb1;
+}
+
+.lede {
+  margin: 0;
+  font-size: 19px;
+  line-height: 1.55;
+  color: #d6d6d6;
+}
+
+.section { display: flex; flex-direction: column; gap: 14px; }
+
+.sectionHead {
+  margin: 0;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: #8a8f93;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--hairline-soft);
+}
+
+.body { margin: 0; font-size: 15px; line-height: 1.65; color: #c9c9c9; }
+
+.meta {
+  margin: 0;
+  display: grid;
+  grid-template-columns: 120px 1fr;
+  gap: 10px 16px;
+  font-size: 14px;
+}
+.meta dt {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #8a8f93;
+  padding-top: 3px;
+}
+.meta dd { margin: 0; color: #c9c9c9; }
+
+.skills { margin: 0; padding: 0; list-style: none; display: flex; flex-wrap: wrap; gap: 7px; }
+.skill {
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #a8adb1;
+  padding: 6px 10px;
+  border: 1px solid var(--hairline);
+}
+
+.visit {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  height: 40px;
+  padding: 0 18px;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--ink);
+  text-decoration: none;
+  border: 1px solid #33383c;
+  background: rgba(255, 255, 255, 0.05);
+  transition: background 150ms ease, border-color 150ms ease;
+}
+.visit:hover { background: rgba(255, 255, 255, 0.1); border-color: #4d5357; }
+.visit span { transition: transform 200ms ease; }
+.visit:hover span { transform: translate(2px, -2px); }

@@ -429,6 +429,10 @@ export function SlotMachine({
                             ) : (
                               <span className={styles.faceGlyph} aria-hidden="true" />
                             )}
+
+                            {/* The artwork no longer carries baked-in text, so
+                                the value is set here instead. */}
+                            <span className={styles.faceLabel}>{v}</span>
                           </div>
                         )),
                       )}

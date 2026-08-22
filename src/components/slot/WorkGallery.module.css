@@ -4,8 +4,6 @@
    ────────────────────────────────────────────────────────────────────────── */
 
 .collection {
-  --amber: #e9a944;
-  --amber-dim: rgba(233, 169, 68, 0.13);
   display: flex;
   flex-direction: column;
   min-width: 0;
@@ -18,10 +16,21 @@
   grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 1px;
   background: #000;
+  /* No frame here. The cards each carry their own ring, so the outside edge of
+     the collection is already drawn — a border would sit directly on top of it
+     and read as a double line. */
   border: 1px solid #000;
+
+  /* The card UI is 10px uppercase mono on #0b0c0d, where the global --mute
+     lands at 3.7:1 — under the 4.5:1 AA floor for text this small. Lifted
+     for the gallery only; the rest of the site keeps the quieter scale. */
+  --mute: #a8adb1;
+  --body: #c9c9c9;
   transition: opacity 220ms ease;
 }
-.grid[data-spinning="true"] { opacity: 0.5; }
+/* Halving the grid mid-spin stacked with the dim state to make unmatched
+   cards near-unreadable. It still recedes, just not out of sight. */
+.grid[data-spinning="true"] { opacity: 0.72; }
 
 .card {
   position: relative;
@@ -32,7 +41,13 @@
   /* Still black — depth comes from the gutters being darker than the card and
      from a hairline catch-light on the top edge, not from a lighter grey fill. */
   background: #0b0c0d;
-  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  /* A full inset ring rather than a real border: the cards sit in a 1px grid
+     gap, and an actual border would eat into the padding and shift every
+     card's contents. The brighter top edge stays on top of it as a
+     catch-light. */
+  box-shadow:
+    inset 0 0 0 1px rgba(255, 255, 255, 0.07),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
   transition:
     opacity 320ms ease,
     filter 320ms ease,
@@ -51,6 +66,19 @@
   filter: grayscale(1);
 }
 .card[data-dim="true"]:hover { opacity: 0.75; filter: grayscale(0.4); }
+
+/* Artwork on a light ground needs a deeper dim. At the default 0.34 a
+   parchment panel composites to roughly #5a5a5a over the near-black canvas —
+   the large mid-grey surface DESIGN.MD rules out — and it is the state the
+   card sits in on most spins. 0.12 lands it back around #2a2a2a. */
+.card[data-light-art="true"][data-dim="true"] {
+  opacity: 0.12;
+  filter: grayscale(0.85);
+}
+.card[data-light-art="true"][data-dim="true"]:hover {
+  opacity: 0.55;
+  filter: grayscale(0.25);
+}
 
 /* Five-column base so a pair can never split evenly. Spans are composed per
    spin in WorkGallery.tsx and applied inline — rows are only ever [5], [3,2]
@@ -73,18 +101,59 @@
 /* Purpose-made project artwork, shown at the head of the card. */
 .cover {
   position: relative;
+  /* The artwork sits at its true size and is centred; any extra height the
+     grid hands the card shows as the artwork's own ground above and below. */
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
   aspect-ratio: 16 / 10;
   overflow: hidden;
   background: #08090b;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+/* Top slot: full-bleed above the card.
+
+   A full border, not just the bottom divider. The card's own outline is an
+   inset box-shadow, and child elements paint over their parent's inset
+   shadow — so the artwork, sitting flush to the card's top, left and right
+   edges, hides the ring behind it. Drawing the box here puts the line back
+   in exactly the same place. */
+.coverBanner {
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+/* Grid rows stretch every card to the tallest in its row, and that slack has
+   to land somewhere. By default .body takes it, which opens a gap between the
+   description and the footer. Handing it to the artwork instead closes the gap
+   and lets the image run to the card's full height.
+
+   flex-grow with an auto basis, never the `flex: 1` shorthand — that resets
+   flex-basis to 0 and would discard aspect-ratio as the starting size. The
+   artwork crops rather than stretches: ArtFrame is preserveAspectRatio="slice"
+   and .coverImg is object-fit: cover. */
+.card[data-art-slot="top"] .cover { flex-grow: 1; }
+.card[data-art-slot="top"] .body { flex: 0 0 auto; }
+
+/* Middle and bottom slots live inside the body but break out of its padding,
+   so the artwork still runs edge to edge. Square, and ruled top and bottom —
+   it is sandwiched by text, so it needs a divider on both sides. */
+.coverInset {
+  width: auto;
+  margin-inline: calc(var(--card-pad) * -1);
+  /* Same reason as .coverBanner — it breaks out to the card's full width, so
+     its left and right edges cover the ring too. */
+  border: 1px solid rgba(255, 255, 255, 0.07);
 }
 
 /* Coded artwork fills the cover box the same way an image would. */
 .cover > svg {
   display: block;
   width: 100%;
-  height: 100%;
+  /* Never 100% — that stretches the drawing into whatever height the frame
+     ended up with, and preserveAspectRatio="slice" would crop it. */
+  height: auto;
+  aspect-ratio: 16 / 10;
 }
 
 .coverImg {
@@ -99,13 +168,28 @@
   flex-direction: column;
   gap: 16px;
   flex: 1;
-  padding: 22px;
+  /* Exposed so full-bleed children can cancel it exactly. */
+  --card-pad: 22px;
+  padding: var(--card-pad);
 }
 
 /* Artwork cards read as a unit, so the whole card lifts on hover. */
 .card[data-cover="true"]:hover { background: #101113; }
 
 .cardHead { display: flex; align-items: flex-start; gap: 13px; }
+
+/* Kept in the outline, out of the layout — used where the artwork already
+   states the project name and repeating it is what makes a card feel busy. */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
 
 .logo {
   width: 30px;
@@ -149,21 +233,6 @@
   color: var(--mute);
 }
 
-.scorePip {
-  flex: none;
-  padding: 3px 6px;
-  font-family: var(--font-geist-mono), monospace;
-  font-size: 9px;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-  color: var(--mute);
-  border: 1px solid var(--hairline);
-}
-.scorePip[data-score="3"] {
-  color: var(--amber);
-  border-color: rgba(233, 169, 68, 0.4);
-  background: var(--amber-dim);
-}
 
 .blurb {
   margin: 0;
@@ -172,35 +241,23 @@
   color: var(--body);
 }
 
-.tags { display: flex; flex-wrap: wrap; gap: 7px; margin-top: auto; }
 
-.tag {
-  font-family: var(--font-geist-mono), monospace;
-  font-size: 9px;
-  font-weight: 500;
-  letter-spacing: 0.07em;
-  text-transform: uppercase;
-  padding: 5px 9px;
-  color: #6b7074;
-  border: 1px solid var(--hairline);
-  transition: color 220ms ease, border-color 220ms ease, background 220ms ease;
-}
-.tagSkill { color: #55595d; border-color: var(--hairline-soft); }
-.tagMore { color: #3d4245; border-style: dashed; }
 
-.tagHit {
-  color: var(--amber);
-  border-color: rgba(233, 169, 68, 0.38);
-  background: var(--amber-dim);
-}
-
+/* One row. Every destination shares it and splits the width evenly, so the
+   footer costs a single button height no matter how many actions a card has. */
 .cardFoot {
   display: flex;
+  /* Inherited from the tag row it replaced: keeps footers aligned across a
+     row of cards whose descriptions differ in height. */
+  margin-top: auto;
   align-items: center;
   gap: 8px;
-  margin-top: 4px;
-  padding-top: 18px;
+  padding-top: 12px;
   border-top: 1px solid var(--hairline-soft);
+}
+.cardFoot .action {
+  flex: 1;
+  justify-content: center;
 }
 
 .year {
@@ -211,18 +268,18 @@
   font-size: 9px;
   font-weight: 600;
   letter-spacing: 0.1em;
-  color: #5a5f63;
+  color: #a8adb1;
 }
 
-/* Whole-card click target: the primary action's pseudo-element stretches to
-   the card's bounds, so clicking anywhere follows it. Kept as one real link
-   rather than a wrapper, so the card still exposes a single destination to
-   screen readers and text stays selectable. */
-.card[data-linked="true"] { cursor: pointer; }
+/* Whole-card click target.
 
-.action[data-primary="true"] { position: static; }
-.action[data-primary="true"]::after {
-  content: "";
+   A real link laid over the card rather than a wrapper around it, so the
+   card still exposes one destination to screen readers, text stays
+   selectable, and the action buttons — which are separate destinations —
+   sit above it at z-index 2 and take their own clicks. */
+.card { cursor: pointer; }
+
+.cardLink {
   position: absolute;
   inset: 0;
   z-index: 1;
@@ -242,14 +299,14 @@
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  height: 30px;
-  padding: 0 13px;
+  height: 32px;
+  padding: 0 10px;
   font-family: var(--font-geist-mono), monospace;
   font-size: 10px;
   font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--mute);
+  color: #b4b9bd;
   text-decoration: none;
   border: 1px solid var(--hairline);
   transition: color 150ms ease, border-color 150ms ease, background 150ms ease;
@@ -261,3 +318,25 @@
 }
 .action span { transition: transform 200ms ease; }
 .action:hover span { transform: translateX(2px); }
+
+/* The project's own site — the one escape hatch out of the gallery.
+
+   Everything else on the card leads inward: clicking the card follows the
+   stretched primary link, and the chips are internal pages. This is the
+   only element that leaves, so it runs edge to edge and is the only filled
+   surface in the footer — unmissable, and impossible to confuse with the
+   card-wide click. Its z-index of 2 (inherited from .action) keeps it above
+   the stretched ::after at z-index 1, so a click here never falls through
+   to the internal destination. */
+.actionOut {
+  height: 32px;
+  justify-content: center;
+  color: var(--ink);
+  border-color: #33383c;
+  background: rgba(255, 255, 255, 0.05);
+}
+.actionOut:hover {
+  border-color: #4d5357;
+  background: rgba(255, 255, 255, 0.1);
+}
+.actionOut:hover span { transform: translate(2px, -2px); }

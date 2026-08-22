@@ -121,9 +121,11 @@
   font-weight: 600;
   letter-spacing: 0.18em;
   text-transform: uppercase;
-  color: #5a5f63;
+  /* Against the #050607 well these were 2.9:1 and 1.4:1 — the count was
+     effectively invisible. Matched to the gallery's lifted scale. */
+  color: #a8adb1;
 }
-.columnCount { color: #34383b; letter-spacing: 0.08em; }
+.columnCount { color: #6f7478; letter-spacing: 0.08em; }
 
 /* ─── Reel window ─────────────────────────────────────────────────────────
    Portrait: --item-h is derived from the rendered column width at the
@@ -171,6 +173,37 @@
 .faceArt {
   object-fit: cover;
   object-position: center;
+}
+
+/* Labels sit over artwork that varies from near-black to bright, so the
+   bottom of every face gets a scrim. Without it the text is legible on some
+   faces and invisible on others. */
+.face::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 52%;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.88) 0%, rgba(0, 0, 0, 0.55) 42%, transparent 100%);
+  pointer-events: none;
+}
+
+/* Dot-matrix face. Doto and DotGothic16 are the only display faces layout.tsx
+   still loads — the other four were unused and have been removed — so
+   --font-dot-gothic is the one drop-in alternative here. */
+.faceLabel {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  padding: 0 8px 11px;
+  font-family: var(--font-doto), monospace;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  line-height: 1.2;
+  text-align: center;
+  text-transform: uppercase;
+  color: #f4f2ef;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.95);
 }
 
 /* Fallback ground: stipple to echo the artwork's dither. */

@@ -18,6 +18,17 @@ export function WorkExplorer() {
   const [result, setResult] = useState<SpinResult | null>(null);
   const [spinning, setSpinning] = useState(false);
 
+  /**
+   * Remount key for the machine.
+   *
+   * Clearing the gallery alone would leave the drums parked on a combination
+   * that no longer filters anything. The machine owns its landed faces, strip
+   * offsets and rAF loop internally, so bumping its React key is the honest
+   * way to put all of it back to the start — every reel returns to rest
+   * together rather than being unwound piece by piece.
+   */
+  const [machineKey, setMachineKey] = useState(0);
+
   const onSpinStart = useCallback(() => setSpinning(true), []);
 
   const onResolve = useCallback((res: SpinResult) => {
@@ -25,14 +36,30 @@ export function WorkExplorer() {
     setResult(res);
   }, []);
 
+  const onReset = useCallback(() => {
+    setResult(null);
+    setSpinning(false);
+    setMachineKey((n) => n + 1);
+  }, []);
+
   return (
     <div className={styles.split}>
       <aside className={styles.control}>
         <div className={styles.controlInner}>
-          <Link className={styles.back} href="/">
-            <span className={styles.backArrow} aria-hidden="true">←</span>
-            Back
-          </Link>
+          <div className={styles.topRow}>
+            <Link className={styles.back} href="/">
+              <span className={styles.backArrow} aria-hidden="true">←</span>
+              Back
+            </Link>
+
+            {/* Only offered once there is something to undo. */}
+            {result && (
+              <button type="button" className={styles.reset} onClick={onReset}>
+                <span className={styles.resetIcon} aria-hidden="true">↺</span>
+                Reset
+              </button>
+            )}
+          </div>
 
           <h1 className={styles.title}>
             Everything I&apos;ve shipped since 2017.{" "}
@@ -41,7 +68,7 @@ export function WorkExplorer() {
             </span>
           </h1>
 
-          <SlotMachine onResolve={onResolve} onSpinStart={onSpinStart} />
+          <SlotMachine key={machineKey} onResolve={onResolve} onSpinStart={onSpinStart} />
 
           <p className={styles.foot}>DRAG THE KNOB DOWN</p>
         </div>

@@ -163,9 +163,13 @@ export type Combo = {
 };
 
 /**
- * How a project can be opened. Every destination is an internal page — the
- * gallery never links straight out, so a case study, a live build and a
- * playable demo all route through the site.
+ * How a project can be opened from inside the site. Every one of these is an
+ * internal page — a case study, a live build and a playable demo all route
+ * through the site rather than off it.
+ *
+ * A project's own public site is separate: see `href` on Project. That one is
+ * outbound, and it never becomes the card's primary action, so the stretched
+ * hit area covering the whole card is always an internal destination.
  */
 export type ProjectLinkKind = "case-study" | "live" | "play";
 
@@ -178,11 +182,19 @@ export type Project = {
   period: string;
   blurb: string;
   logo?: string;
+  /** The project's own site out in the world. Rendered as a secondary,
+   *  outbound action; never the card's stretched primary link. */
   href?: string;
   /** Screenshot shown at the head of the card. */
   cover?: string;
   /** Internal destinations. Projects without any render no actions. */
   links?: ProjectLink[];
+  /**
+   * Long-form sections for the case-study page. Absent for every project
+   * today — the page renders what the archive already knows and simply omits
+   * this block, so adding prose later is additive rather than a migration.
+   */
+  story?: { heading: string; body: string }[];
   /** Projects can sit in more than one bucket — a repo can be Personal *and*
    *  Open Source, a product both Enterprise *and* Marketing. A reel hits if
    *  its value appears anywhere in the list. */
@@ -202,9 +214,9 @@ export const projects: Project[] = [
     name: "Alif",
     role: "Founder & AI Engineer",
     period: "2026 — NOW",
-    blurb:
-      "Enterprise intelligence layer: one conversational agent that queries and acts across 20+ connectors — SAP, Salesforce, Jira, GitHub, SharePoint, Teams, Slack, Gmail, Workspace.",
+    blurb: "An enterprise intelligence layer, querying and acting across 20+ connectors.",
     logo: "/alif-logo.svg",
+    href: "https://joinalif.com",
     type: ["Founder"],
     domain: ["Enterprise"],
     skills: [
@@ -231,8 +243,7 @@ export const projects: Project[] = [
     name: "BeonAI",
     role: "Founder & AI Systems Engineer",
     period: "2025 — NOW",
-    blurb:
-      "Generative Engine Optimization platform. 300K+ evaluations across 6 frontier LLMs for 20+ paying brands, driven by a custom agent harness with a dual-flavor skills runtime.",
+    blurb: "A generative engine optimization platform, running 300K+ evaluations for 20+ paying brands.",
     logo: "/beonai-logo.svg",
     href: "https://beonai.io",
     type: ["Founder"],
@@ -267,9 +278,9 @@ export const projects: Project[] = [
     name: "Paper Pilot",
     role: "Founder · CEO · Founding Engineer",
     period: "2024 — 2025",
-    blurb:
-      "AI literature-review workspace. 220K+ papers parsed, 50K+ answers a day to 3,000+ researchers, every answer grounded to exact PDF coordinates.",
+    blurb: "An AI literature-review workspace, serving 50K+ answers a day to researchers.",
     logo: "/paperpilot-logo.png",
+    href: "https://paperpilot.xyz",
     type: ["Founder"],
     domain: ["Research", "Consumer / Web"],
     skills: [
@@ -296,8 +307,8 @@ export const projects: Project[] = [
     name: "burn0",
     role: "Creator · Open Source",
     period: "2026 — NOW",
-    blurb:
-      "Zero-code LLM and API observability. Hooks Node diagnostics channels and Bun fetch directly — no proxy, no code changes, local SQLite in WAL mode. 5K+ npm downloads.",
+    blurb: "A local-first LLM cost tracker, one import, no proxy, no cloud.",
+    logo: "/burn0-logo.svg",
     href: "https://burn0.dev",
     type: ["Open Source", "Personal"],
     domain: ["DevTools"],
@@ -320,8 +331,7 @@ export const projects: Project[] = [
     name: "GitHub Ask",
     role: "Personal project",
     period: "2025",
-    blurb:
-      "Autonomous codebase agent. A LangGraph state machine explores any repo, chunking code by AST rather than character count, and answers architectural questions.",
+    blurb: "An autonomous codebase agent, chunking any repo by AST rather than characters.",
     type: ["Personal"],
     domain: ["DevTools", "Research"],
     skills: [
@@ -345,8 +355,7 @@ export const projects: Project[] = [
     name: "Hadith Q&A",
     role: "Personal project",
     period: "ARCHIVE",
-    blurb:
-      "Semantic search and synthesis over classical Hadith collections, with citation-grounded answers and graded-source filtering.",
+    blurb: "Semantic search over classical Hadith, returning citation-grounded answers with source grading.",
     type: ["Personal"],
     domain: ["Research", "Consumer / Web"],
     skills: [
@@ -363,8 +372,7 @@ export const projects: Project[] = [
     name: "Basketo Finance",
     role: "Founder · Founding Engineer",
     period: "2022",
-    blurb:
-      "Tokenized crypto baskets on Polygon — ERC-721 portfolios, OHLC time-series ingestion, and a MetaMask dApp, built as an Nx monorepo.",
+    blurb: "Tokenized crypto baskets on Polygon, built as ERC-721 portfolios with a dApp.",
     logo: "/basketo-logo.png",
     cover: "/basketo/assest1.png",
     links: [{ kind: "case-study", href: "/work/basketo" }],
@@ -391,8 +399,7 @@ export const projects: Project[] = [
     name: "Gutenberg AI Campaign Platform",
     role: "Full Stack Engineer",
     period: "2023 — 2024",
-    blurb:
-      "Retrieval-backed campaign platform for global brand teams — semantic search over marketing assets feeding AI-assisted content generation.",
+    blurb: "A retrieval-backed campaign platform, searching marketing assets for global brand teams.",
     logo: "/gutenberg-logo.png",
     type: ["Job"],
     domain: ["Enterprise", "Marketing"],
@@ -410,8 +417,7 @@ export const projects: Project[] = [
     name: "Gutenberg Pricing System",
     role: "Full Stack Engineer",
     period: "2023 — 2024",
-    blurb:
-      "Quote and pricing engine behind enterprise campaign delivery — rate cards, approval flows, and cost rollups across regions.",
+    blurb: "A quote and pricing engine, handling rate cards, approvals and regional rollups.",
     logo: "/gutenberg-logo.png",
     type: ["Job"],
     domain: ["Enterprise"],
@@ -427,8 +433,7 @@ export const projects: Project[] = [
     name: "Tecnotree",
     role: "Frontend Developer · Full Stack Engineer",
     period: "2021 — 2023",
-    blurb:
-      "Telecom BSS platform serving 800M+ subscribers — aggregation and eligibility microservices, catalog, ordering, and billing interfaces.",
+    blurb: "A telecom BSS platform, serving 800M+ subscribers across catalog and billing.",
     logo: "/tecnotree-logo.jpeg",
     type: ["Job"],
     domain: ["Enterprise"],
@@ -448,8 +453,7 @@ export const projects: Project[] = [
     name: "LUXE NFT Hackathon",
     role: "1st Place · Best Interoperability · $25K",
     period: "2021",
-    blurb:
-      "Cross-chain portfolio rebalancing and wallet management, built end-to-end in 48 hours against 200+ teams.",
+    blurb: "A cross-chain portfolio rebalancer, built in 48 hours against 200+ teams.",
     type: ["Hackathon"],
     domain: ["FinTech / Web3"],
     skills: ["Full-Stack Engineering", "System Design", "0→1", "MVP"],
@@ -459,8 +463,7 @@ export const projects: Project[] = [
     name: "Freshworks Attachment Viewer",
     role: "2nd Place · $4.2K",
     period: "2021",
-    blurb:
-      "Freshdesk sidebar extension that aggregates attachments scattered across multi-threaded tickets into one categorized gallery.",
+    blurb: "A Freshdesk sidebar extension, gathering scattered ticket attachments into one gallery.",
     type: ["Hackathon"],
     domain: ["Enterprise"],
     skills: [
@@ -476,8 +479,7 @@ export const projects: Project[] = [
     name: "Square Self-Checkout",
     role: "Most Creative Use Case · $2.5K",
     period: "2021",
-    blurb:
-      "Self-checkout flow repurposing the Square Invoices API so customers scan and pay from their own phone, no cashier involved.",
+    blurb: "A phone-based self-checkout flow, repurposing the Square Invoices API entirely.",
     type: ["Hackathon"],
     domain: ["Consumer / Web"],
     skills: ["System Design", "0→1", "MVP"],
@@ -487,8 +489,7 @@ export const projects: Project[] = [
     name: "Project-5000",
     role: "Hackathon prototype",
     period: "2021",
-    blurb:
-      "The sandbox and proof-of-concept that became the Freshworks attachment viewer.",
+    blurb: "A sandbox and proof-of-concept, later shipped as the Freshworks viewer.",
     type: ["Hackathon"],
     domain: ["Enterprise"],
     skills: ["JavaScript", "Frontend Engineering", "0→1", "MVP"],
@@ -498,8 +499,7 @@ export const projects: Project[] = [
     name: "Three.js Text Geometry",
     role: "Personal project",
     period: "2021",
-    blurb:
-      "WebGL scene with extruded 3D typefaces, matcap materials for faked studio lighting, and orbit controls.",
+    blurb: "A WebGL typography scene, extruding 3D typefaces under matcap lighting.",
     type: ["Personal"],
     domain: ["Creative / Gaming", "Consumer / Web"],
     skills: ["JavaScript", "Frontend Engineering", "0→1"],
@@ -509,8 +509,7 @@ export const projects: Project[] = [
     name: "colorize",
     role: "Personal project",
     period: "2021",
-    blurb:
-      "Hex colour generator built from raw hexadecimal maths, with button physics and live background swaps.",
+    blurb: "A hex colour generator, built from raw hexadecimal maths, no libraries.",
     type: ["Personal"],
     domain: ["Creative / Gaming", "Consumer / Web"],
     skills: ["JavaScript", "Frontend Engineering", "0→1"],
@@ -520,8 +519,7 @@ export const projects: Project[] = [
     name: "Responsive Site · Prodjar",
     role: "Full Stack Developer",
     period: "2020",
-    blurb:
-      "Agency take-home built with zero CSS frameworks — flexbox reordering on mobile, sticky nav, custom focus states.",
+    blurb: "An agency take-home build, written with zero CSS frameworks, flexbox throughout.",
     logo: "/prodjar-logo.jpeg",
     type: ["Job"],
     domain: ["Consumer / Web"],
@@ -532,8 +530,7 @@ export const projects: Project[] = [
     name: "Hacker News Clone",
     role: "Personal project",
     period: "2020",
-    blurb:
-      "Firebase HN API client with sequential async ingestion — top story IDs first, then parallel item resolution.",
+    blurb: "A Hacker News client, resolving story IDs then items in parallel.",
     type: ["Personal"],
     domain: ["Consumer / Web"],
     skills: ["JavaScript", "React", "Frontend Engineering", "0→1", "MVP"],
@@ -543,8 +540,7 @@ export const projects: Project[] = [
     name: "fortRes",
     role: "Personal project",
     period: "2019",
-    blurb:
-      "Portfolio hub on a custom domain, routed through a root CNAME to GitHub Pages.",
+    blurb: "A personal portfolio hub, routed through a CNAME to GitHub Pages.",
     type: ["Personal"],
     domain: ["Consumer / Web"],
     skills: ["Frontend Engineering", "0→1", "MVP"],
@@ -554,8 +550,7 @@ export const projects: Project[] = [
     name: "Portfolio v1",
     role: "Personal project",
     period: "2019",
-    blurb:
-      "First portfolio site, with an interactive canvas particle web reacting to cursor velocity.",
+    blurb: "My first portfolio site, with a canvas particle web tracking cursor velocity.",
     type: ["Personal"],
     domain: ["Consumer / Web", "Creative / Gaming"],
     skills: ["JavaScript", "Frontend Engineering", "0→1", "MVP"],
@@ -565,8 +560,7 @@ export const projects: Project[] = [
     name: "Text Editor",
     role: "Personal project",
     period: "2019",
-    blurb:
-      "In-browser IDE — Ace editor piping keystrokes into a sandboxed iframe for live HTML preview.",
+    blurb: "An in-browser code editor, piping keystrokes into a sandboxed live preview.",
     type: ["Personal"],
     domain: ["DevTools", "Consumer / Web"],
     skills: ["JavaScript", "Frontend Engineering", "0→1", "MVP"],
@@ -576,8 +570,7 @@ export const projects: Project[] = [
     name: "os-on-screen-time",
     role: "Author · npm package",
     period: "2019",
-    blurb:
-      "First published package — zero dependencies, reading OS uptime straight from Node's native os module.",
+    blurb: "My first published package, reading OS uptime with zero dependencies.",
     type: ["Open Source", "Personal"],
     domain: ["DevTools"],
     skills: ["Node.js", "Backend Engineering", "0→1", "MVP"],
@@ -587,8 +580,7 @@ export const projects: Project[] = [
     name: "Weather App",
     role: "Personal project",
     period: "2019",
-    blurb:
-      "Production-shaped Express API — full CRUD routing with Joi validation, Helmet headers, and custom event emitters.",
+    blurb: "A production-shaped Express API, with full CRUD, Joi validation and Helmet.",
     type: ["Personal"],
     domain: ["Consumer / Web"],
     skills: ["Node.js", "Backend Engineering", "0→1", "MVP"],
@@ -598,8 +590,7 @@ export const projects: Project[] = [
     name: "note-app-nodeJS",
     role: "Personal project",
     period: "2019",
-    blurb:
-      "Node CLI with yargs command schemas and defensive JSON persistence to disk.",
+    blurb: "A Node command-line notes tool, using yargs schemas and defensive JSON persistence.",
     type: ["Personal"],
     domain: ["DevTools"],
     skills: ["Node.js", "Backend Engineering", "0→1", "MVP"],
@@ -609,8 +600,7 @@ export const projects: Project[] = [
     name: "Face Detection",
     role: "Personal project",
     period: "2019",
-    blurb:
-      "Real-time webcam face tracking with Haar cascade classifiers and tuned multi-scale detection.",
+    blurb: "Real-time webcam face tracking, using tuned multi-scale Haar cascade classifiers.",
     type: ["Personal"],
     domain: ["Research"],
     skills: ["Python"],
@@ -620,8 +610,7 @@ export const projects: Project[] = [
     name: "Lane Detection",
     role: "Personal project",
     period: "2019",
-    blurb:
-      "Grayscale → Gaussian blur → Canny → triangular ROI mask → Hough transform, extrapolating continuous lane markers.",
+    blurb: "A road lane detector, running Canny edges through a Hough transform.",
     type: ["Personal"],
     domain: ["Research"],
     skills: ["Python"],
@@ -631,8 +620,7 @@ export const projects: Project[] = [
     name: "Linear Regression From Scratch",
     role: "Personal project",
     period: "2019",
-    blurb:
-      "Gradient descent derived by hand — partial derivatives of MSE, no ML libraries.",
+    blurb: "Linear regression from scratch, deriving MSE partial derivatives by hand.",
     type: ["Personal"],
     domain: ["Research"],
     skills: ["Python"],
@@ -642,8 +630,7 @@ export const projects: Project[] = [
     name: "Digit Recognition — SVM",
     role: "Personal project",
     period: "2019",
-    blurb:
-      "Support vector classification over 8×8 digit matrices, tuning RBF kernel gamma and C.",
+    blurb: "A handwritten digit classifier, tuning RBF kernels over 8×8 matrices.",
     type: ["Personal"],
     domain: ["Research"],
     skills: ["Python"],
@@ -653,8 +640,7 @@ export const projects: Project[] = [
     name: "First Linear Regression",
     role: "Personal project",
     period: "2018",
-    blurb:
-      "First ML project — train/test splitting and an ordinary least squares fit, plotted against the data.",
+    blurb: "My first machine learning project, fitting ordinary least squares to real data.",
     type: ["Personal"],
     domain: ["Research"],
     skills: ["Python"],
@@ -664,8 +650,7 @@ export const projects: Project[] = [
     name: "FrontEndInternship",
     role: "Frontend Intern",
     period: "2018",
-    blurb:
-      "First professional React codebase — centralized Redux store, thunk and promise middleware, custom Webpack build.",
+    blurb: "My first professional React codebase, with a Redux store and custom Webpack.",
     logo: "/rebelbase-logo.jpeg",
     type: ["Job"],
     domain: ["Consumer / Web"],
@@ -676,8 +661,7 @@ export const projects: Project[] = [
     name: "MUSIC-PLAYER",
     role: "Personal project",
     period: "2018",
-    blurb:
-      "Browser Audio API player with index-driven playlist state and blurred album art backdrops.",
+    blurb: "A browser music player, driving playlist state through the Audio API.",
     type: ["Personal"],
     domain: ["Creative / Gaming", "Consumer / Web"],
     skills: ["JavaScript", "Frontend Engineering", "0→1", "MVP"],
@@ -687,8 +671,7 @@ export const projects: Project[] = [
     name: "CS-LEETS",
     role: "Personal project",
     period: "2018",
-    blurb:
-      "Community site built on strict semantic HTML5 structure and typographic hierarchy.",
+    blurb: "A student community site, built on strict semantic HTML5 and hierarchy.",
     type: ["Personal"],
     domain: ["Consumer / Web"],
     skills: ["Frontend Engineering", "0→1", "MVP"],
@@ -698,8 +681,7 @@ export const projects: Project[] = [
     name: "NEED-FOR-SPEED",
     role: "Personal project",
     period: "2018",
-    blurb:
-      "Full-viewport video hero with layered rgba overlays keeping text legible against high-motion footage.",
+    blurb: "A full-viewport video hero, layering rgba overlays to keep text legible.",
     type: ["Personal"],
     domain: ["Creative / Gaming", "Consumer / Web"],
     skills: ["Frontend Engineering"],
@@ -709,8 +691,7 @@ export const projects: Project[] = [
     name: "SPACE-X",
     role: "Personal project",
     period: "2018",
-    blurb:
-      "Zero-JS parallax built purely from background-attachment, with graceful mobile fallbacks.",
+    blurb: "A zero-JavaScript parallax page, built purely from background-attachment and mobile fallbacks.",
     type: ["Personal"],
     domain: ["Creative / Gaming", "Consumer / Web"],
     skills: ["Frontend Engineering"],
@@ -720,8 +701,7 @@ export const projects: Project[] = [
     name: "music-balls",
     role: "Personal project · Open Source",
     period: "2018",
-    blurb:
-      "Canvas toy at 60 FPS — Paper.js frame loop rotating hues while Howler.js plays 26 pre-cached samples polyphonically. Merged community PRs.",
+    blurb: "A Paper.js canvas toy, running 26 polyphonic samples at 60 FPS.",
     type: ["Personal", "Open Source"],
     domain: ["Creative / Gaming", "Consumer / Web"],
     skills: ["JavaScript", "Frontend Engineering", "0→1"],
@@ -731,8 +711,7 @@ export const projects: Project[] = [
     name: "TO-DO-LIST-APP",
     role: "Personal project",
     period: "2018",
-    blurb:
-      "Event delegation on the parent list so dynamically added items inherit behaviour, with propagation stopped on delete.",
+    blurb: "A vanilla JavaScript to-do list, using event delegation so new items work.",
     type: ["Personal"],
     domain: ["Consumer / Web"],
     skills: ["JavaScript", "Frontend Engineering", "0→1"],
@@ -742,8 +721,7 @@ export const projects: Project[] = [
     name: "RGB Color Game",
     role: "Personal project",
     period: "2018",
-    blurb:
-      "The first one. Random RGB generation across three channels with difficulty modes that resize the grid.",
+    blurb: "My very first project, generating random RGB across three difficulty modes.",
     type: ["Personal"],
     domain: ["Creative / Gaming", "Consumer / Web"],
     skills: ["JavaScript", "Frontend Engineering", "0→1"],
