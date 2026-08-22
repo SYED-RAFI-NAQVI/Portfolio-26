@@ -5,7 +5,7 @@ import { InteractionSounds } from "../../components/InteractionSounds";
 import { AboutDrawer } from "../../components/about/AboutDrawer";
 
 export const metadata: Metadata = {
-  title: "Project Hunter — Rafi Naqvi",
+  title: "Work",
   description:
     "Pull the lever. Three reels — type, domain, skill — land on a combination and the machine surfaces the matching work.",
 };

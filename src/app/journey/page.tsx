@@ -3,7 +3,7 @@ import { JourneyExperience } from "../../components/journey/JourneyExperience";
 import { journeyMilestones } from "../../data/journey";
 
 export const metadata: Metadata = {
-  title: "Journey — Rafi Naqvi",
+  title: "Journey",
   description: "A visual archive of work, experiments, milestones, and lessons.",
 };
 

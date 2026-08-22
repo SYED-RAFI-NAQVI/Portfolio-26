@@ -29,7 +29,7 @@ export async function generateMetadata({
   const { slug } = await params;
   const project = projects.find((p: Project) => p.id === slug);
   if (!project) return {};
-  return { title: `${project.name} — Syed Rafi Naqvi`, description: project.blurb };
+  return { title: project.name, description: project.blurb };
 }
 
 export default async function CaseStudy({

@@ -1,4 +1,11 @@
+import type { Metadata } from "next";
 import styles from "./page.module.css";
+
+export const metadata: Metadata = {
+  title: "Skills",
+  description:
+    "The stack behind six years of shipping — frontend, backend, AI systems, and the things that hold them together.",
+};
 import Link from "next/link";
 import Image from "next/image";
 import { AboutDrawer } from "../../components/about/AboutDrawer";
@@ -83,7 +90,7 @@ export default function SkillsPage() {
           <div className={styles.cardHeader}>Personality</div>
           <div className={styles.cardBody}>
             <h3>Relentless Builder</h3>
-            <p>I don't just architect; I ship. Obsessed with the final 10% of polish.</p>
+            <p>I don’t just architect; I ship. Obsessed with the final 10% of polish.</p>
           </div>
         </div>
       </section>
