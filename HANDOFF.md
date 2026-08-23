@@ -1,152 +1,186 @@
-# Handoff — `/work` slot-machine explorer
+# Handoff — `/work` explorer, project pages, card artwork
 
-Written 2026-08-22. Branch `feat/work-slot-machine`, pushed, **not yet merged to `master`**.
+Updated 2026-08-22. Branch `feat/work-slot-machine`, pushed through `f97fe44`,
+**not yet merged to `master`**.
 
 ---
 
 ## 1. Working agreements
 
 **Never use Playwright or any browser automation in this repo.** Verify with
-`npx tsc --noEmit`, `npx eslint`, and `npx next build`. When visual confirmation is
-needed, describe what to look at and **ask the user for a screenshot**. This is a
-standing rule, already saved to memory.
+`npx tsc --noEmit`, `npx eslint`, and `npx next build`. When visual confirmation
+is needed, describe what to look at and **ask the user for a screenshot**.
+
+**Ask in prose, never with a multiple-choice prompt.** `AskUserQuestion` was
+offered twice this session and rejected both times. The user works in short, fast
+directives; a choice card is slower to read than the answer is to type. State a
+recommendation in two sentences and let them reply, or take the obvious default,
+say which one you took, and keep going.
+
+**Don't over-explain.** Repeated feedback. Short answers, then act. The same
+instinct applies to the artwork — see §5.
 
 **Read `node_modules/next/dist/docs/` before writing Next-specific code.** Per
-`AGENTS.md`, this Next version (16.3.1, Turbopack) has breaking changes vs. training
-data. The fonts and app-router APIs were checked and are unchanged, but don't assume.
+`AGENTS.md`, this version (16.3.1, Turbopack) differs from training data. It has
+already caught two real bugs this session: `params` is `Promise<{slug}>` and must
+be awaited, and `images.minimumCacheTTL` defaults to 4 hours.
 
-**Design system lives in `DESIGN.MD`.** Dark-first, monochrome by default, colour is
-rare and carries meaning, *"subtle differences between near-black surfaces to create
-depth — avoid large medium-gray surfaces."* That last line was violated once and had
-to be reverted; take it literally.
+**When patching files with scripts, assert before replacing.** Every patch should
+fail loudly on a non-matching target and write nothing. This caught a miscounted
+blurb and a bad script that would otherwise have half-applied.
 
-**When patching files with scripts, assert before replacing.** Several `str.replace`
-calls silently no-opped during this work and I reported changes that never landed —
-one of them dropped `"Shipping"` out of `SKILL_REEL` without any error. Every patch
-should fail loudly on a non-matching target.
+**Stop the dev server before bulk filesystem operations.** Converting 60 images
+and deleting 73 files under a running `next dev` corrupted Turbopack's incremental
+graph (`Cell ... no longer exists`), which only a `rm -rf .next` and restart fixed.
+Note the discriminator: **`next build` passing while `next dev` panics means cache,
+not code** — a build creates a fresh graph each run.
+
+**Design system lives in `DESIGN.MD`.** Dark-first, monochrome by default, colour
+is rare and carries meaning.
 
 ---
 
 ## 2. What exists
 
-Route `/work` (there is no `/slot` — it was renamed). Full-viewport, no nav bar.
-
 ```
-src/app/work/page.tsx            shell: InteractionSounds + WorkExplorer + AboutDrawer
-src/app/work/page.module.css     100vh flex shell, overflow hidden
+src/app/work/page.tsx              shell: InteractionSounds + WorkExplorer + AboutDrawer
+src/app/work/[slug]/page.tsx       project page — one per project, all 37
+src/app/work/[slug]/page.module.css
 
 src/components/slot/
-  WorkExplorer.tsx/.css          40/60 split, owns spin state, back link, h1, hint
-  SlotMachine.tsx/.css           cabinet, three reels, vertical lever
-  WorkGallery.tsx/.css           ranked project grid, FLIP re-ranking
-  art/AlifArt.tsx                Alif's card artwork, drawn in SVG
+  WorkExplorer.tsx/.css            two-column split, owns spin + reset state
+  SlotMachine.tsx/.css             cabinet, three reels, lever rail, reset button
+  WorkGallery.tsx/.css             ranked card grid, FLIP re-ranking
+  art/
+    kit.tsx                        ArtFrame, Ground, Mark, font + viewBox tokens
+    registry.ts                    ART map — the single source for card artwork
+    marks.ts                       brand mark paths extracted from public/
+    AlifArt.tsx  BeonAIArt.tsx  PaperPilotArt.tsx  Burn0Art.tsx
 
-src/data/slot.ts                 reels, art maps, 37-project archive, matching engine
-src/sounds/slotSounds.ts         WebAudio SFX built on the existing SoundManager
+src/data/slot.ts                   reels, art maps, 37-project archive, matching engine
+src/sounds/slotSounds.ts           WebAudio SFX
+src/components/InteractionSounds   sound prompt + toggle, bottom-left, both pages
 ```
-
-Left pane and right pane scroll **independently** (`overflow-y: auto` on each, page
-itself never scrolls). Scrollbars are hidden in all engines but scrolling works.
 
 ---
 
 ## 3. How the machine works
 
-**Reels are `5 / 7 / 35`** — Type, Domain, Skill. Every face has artwork
-(`public/type/`, `public/domain/`, `public/skills/`), 47 cards total.
+**Reels are 5 / 7 / 35** — Type, Domain, Skill. Every face has artwork in
+`public/type`, `public/domain`, `public/skills`, now **WebP** (was PNG; 82.8 MB →
+7.6 MB). Art is keyed by reel *and* value via `artFor(reelIndex, value)` — `Founder`
+appears on both the Type and Skill reels and needs a different card on each.
 
-**Art is keyed by reel *and* value**, via `artFor(reelIndex, value)` in `slot.ts`.
-This matters: `Founder` appears on both the Type and Skill reels and needs a
-different card on each. Keying by value alone silently overwrites one.
+**Face labels are DOM text, not baked into the images.** Set in Doto with a
+`.face::after` scrim, because the artwork ranges from near-black to bright and a
+label without a scrim is legible on some faces and invisible on others.
 
 **Physics** (`SlotMachine.tsx`): a rAF loop writes `transform` directly to the strip
 elements, so React never re-renders during a spin. Phases are
-`spin → settle → bounce → locked`, staggered per reel.
+`spin → settle → bounce → locked`, staggered per reel. Tick SFX are gated by
+velocity. `CARD_RATIO` + a `ResizeObserver` derive cell height from measured column
+width, and on resize `pos`/`to`/`from`/`loop` are **rescaled proportionally** —
+without that, drums park between faces.
 
-- Tick SFX are **gated by velocity** (`TICK_GATE`) — that's what makes it sound
-  mechanical: silence at speed, accelerating clacks as it slows.
-- `CARD_RATIO` + a `ResizeObserver` derive cell height from the measured column
-  width. On resize, `pos`/`to`/`from`/`loop` are **rescaled proportionally** —
-  without that, drums park between faces and the next spin lands off-register.
-- `landingPosition()` takes the live cell size as an argument; it must not close
-  over a constant.
-
-**Lever** has a vertical throw. Pointer-drag, click, and Space/Enter all work. The
-`--pull` CSS var is written to the rig element, and the shaft is clipped by an
-`overflow: hidden` channel so it looks like it retracts into the housing.
+**Reset** lives on the lever rail above the lever, not in the page nav — it acts on
+the machine, so it belongs on the machine. It works by **bumping `SlotMachine`'s
+React `key`** from `WorkExplorer`. The machine keeps landed faces, strip offsets and
+phase in internal state and in DOM transforms written outside React, so remounting
+is the only clean way to unwind all of it at once.
 
 ---
 
-## 4. Matching and ranking
+## 4. Cards and the gallery
 
-`resolveCombo()` is strictly tiered: if any project scores 3/3, only 3/3 projects
-return; otherwise it falls back to 2/3, then 1/3. `pickSpinTarget()` biases landings
-toward combinations a real project satisfies (`JACKPOT_BIAS = 0.7`).
+**Every card is a link to `/work/<id>`.** A dedicated `<Link>` laid over the card at
+`z-index: 1`, not the old "first action's `::after`" trick. Action buttons sit at
+`z-index: 2`, which is what keeps the two behaviours independent: click the
+`WEBSITE ↗` bar and you leave the site, click anywhere else and you go inside.
+**That stacking order is load-bearing** — swap either number and the button silently
+stops working.
 
-`rankProjects()` returns **every** project re-ordered — the gallery never filters
-down, non-matches just dim. Removing them made the grid flash empty.
+**Card anatomy is now:** artwork · logo · name · role · year · description · one
+button row. Tags, the overflow counter and the score pip were all removed. Note
+`margin-top: auto` moved from `.tags` to `.cardFoot` when tags went — it is what
+keeps footers aligned across a row.
 
-`type` and `domain` are **arrays** (`ReelType[]`, `ReelDomain[]`) so a project can be
-both Personal and Open Source. Ties inside a tier break on archive index, so the
-editorial "strongest first" order survives filtering.
+**Grid is `repeat(5, 1fr)`,** spans composed per spin by `buildSpans()` from a row
+grammar (`[5]`, `[3,2]`, `[2,3]`), seeded by a hash of the landed combination —
+never `Math.random()`, which would reshuffle on re-render and break FLIP. Same
+constraint applies inside artwork: `PaperPilotArt`'s node table is hardcoded for
+this reason.
+
+**Borders:** the grid itself has no light frame. Each card carries an inset ring,
+and the artwork carries its own full border — necessary because **child elements
+paint over a parent's `inset` box-shadow**, so full-bleed artwork erases the card's
+ring wherever it overlaps.
+
+**`ART` registry entries** (`art/registry.ts`) carry four flags:
+
+| flag | meaning |
+|---|---|
+| `slot` | `top` \| `middle` \| `bottom` — where artwork sits in the card |
+| `bare` | artwork already shows the logo and name, so the head hides them (the `<h2>` stays, `.srOnly`, for the document outline) |
+| `light` | artwork on a light ground — needs a deeper dim, see `[data-light-art]` |
+| `ground` | the artwork's own background colour |
+
+**`ground` is what solves the stretched-card gap.** Grid rows stretch cards to the
+tallest in the row; rather than crop the artwork or leave a hole, `.cover` is painted
+the artwork's own colour and the art is centred in it, so leftover height reads as
+padding the artwork was drawn with. `.cover > svg` must stay `height: auto` with
+`aspect-ratio` — `height: 100%` stretches the drawing and `preserveAspectRatio="slice"`
+then crops it.
 
 ---
 
-## 5. Gallery layout
+## 5. Card artwork — what was learned
 
-Grid is `repeat(5, 1fr)`. **Spans are composed per spin in JS**, not by `nth-child`:
+Four attempts at burn0 were rejected before landing. The lesson, in order:
 
-- `buildSpans()` emits rows from a grammar — a row is only `[5]`, `[3,2]` or `[2,3]`.
-  Generating valid *rows* rather than per-card widths is what guarantees every row
-  fills exactly 5 columns.
-- The seed is a hash of the landed combination, **not `Math.random()`** — a random
-  layout would reshuffle on re-render and break the FLIP measurements.
-- Hard constraints the user set: **never 50/50, never more than 2 per row, no
-  project locked to one width.**
+1. **An asset card is a poster, not a diagram.** It has a half-second budget.
+   Anything that has to be *read* is failing at the job. A three-pane TUI, a
+   five-column table and an itemised receipt were all rejected as "explaining the
+   product".
+2. **Draw the product, not the idea.** Paper Pilot's first version was a generic
+   document with grey bars — it could have been any PDF reader. What makes BeonAI's
+   card work is that it draws the actual composer with the real prompt copy and the
+   real orb.
+3. **But draw one surface, not the whole app.** BeonAI's strength is *scope* — one
+   input box, not the dashboard behind it.
+4. **Some products have no surface.** burn0 is a library you never look at, so
+   inventing a screen for it was inventing its face. It ended as type only:
+   wordmark plus one line. That is the honest answer, not a fallback.
+5. **Don't reuse one composition.** Paper Pilot, burn0 and Basketo all briefly
+   shared wordmark-left / graphic-right / radial-glow and read as one template.
 
-**FLIP re-ranking** (`useFlip` in `WorkGallery.tsx`): measure → reorder → invert with
-a transform → play to zero, via the Web Animations API. React keys stay stable so
-real position deltas animate. Cards resize as well as move, since width comes from
-the composed layout.
+Constraint that has not changed: the card renders around 420px wide against a
+1600-unit viewBox, so **anything under ~28 units is below 7px on screen and becomes
+noise.** Keep new artwork to a handful of large shapes.
 
-**Card anatomy:** artwork (16:10) → logo + name + year → role → tags → action row.
-Description is hidden when a card has artwork. The whole card is clickable via the
-**stretched-link** pattern — `.card` is `position: relative`, the primary action is
-`position: static`, and its `::after { inset: 0 }` resolves against the card. Making
-that action `relative` collapses the hit area back to the button.
-
-**Depth comes from the gutters, not the fill.** Cards are `#0b0c0d`, one value above
-the canvas; the 1px gaps are pure `#000`, *below* both. Plus a 5% white inset hairline
-on the top edge as a catch-light. A lighter grey fill was tried and rejected.
+Basketo is the one PNG (`/basketo/assest1.png`) and is the reference for the
+key-art register. Its wordmark cannot be resized like the coded ones.
 
 ---
 
-## 6. Card artwork
+## 6. Project pages
 
-Two mechanisms, both supported:
+`/work/[slug]` renders **all 37 projects** — the card is a link, so no card leads
+nowhere. `params` is `Promise<{ slug: string }>` and must be awaited.
 
-- **Image** — `project.cover`, a PNG. Basketo uses `/basketo/assest1.png`.
-- **Code** — a component registered in `ART` in `WorkGallery.tsx`, keyed by project
-  id. Alif uses `art/AlifArt.tsx`.
+Page carries: hero artwork · name · role · period · description · Context
+(type/domain) · **the full skill list** · website link. The full stack list living
+here is what justifies the card carrying none.
 
-**Prefer code.** These are flat vector layouts, and generated PNGs gave wrong logo
-glyphs and uncanny faces. `AlifArt` embeds the real glyph path and `#2A2AFF` straight
-from `public/alif-logo.svg`, on a fixed `1600×1000` viewBox so it stays crisp at any
-card width.
-
-**Hard-won constraint:** the card renders around 420px wide, ~26% scale. Anything
-under ~24px in the viewBox falls below 7px on screen and becomes noise. Four
-increasingly detailed versions of `AlifArt` were rejected before landing on
-mark + wordmark + one line. **Keep new artwork to a handful of large shapes.**
-
-Full-page screenshots do not work as card art — black-on-black has no edge and the
-type is illegible at card size. Purpose-made assets only.
+`Project.story?: { heading, body }[]` exists and renders when present. **It is
+empty for every project** — the pages currently have no narrative, which is the
+biggest content gap on the branch.
 
 ---
 
 ## 7. Outstanding
 
-**Ten skills have zero project tags** and are the highest-priority fix:
+**Ten skills still have zero project tags** — unchanged, and still the highest-value
+data fix:
 
 ```
 Machine Learning, Computer Vision, Databases, Vector Databases,
@@ -154,45 +188,74 @@ Queues & Background Jobs, Streaming, Smart Contracts,
 WebGL / Creative Coding, CLI & Developer Tooling, Programmatic SEO
 ```
 
-That's 29% of the skill reel that can never match. Worse, `pickSpinTarget()` samples
-a real project and reads a triple off it, so these can **never** be chosen on a
-rigged spin — they only appear on free spins and always fall back to 2/3.
+29% of the skill reel can never match. Worse, `pickSpinTarget()` samples a real
+project and reads a triple off it, so these can never be chosen on a rigged spin.
+Intended mapping: ML/CV → the 2019 Python and OpenCV work; Databases/Queues → the
+flagships; WebGL → Three.js and music-balls; Smart Contracts → Basketo; CLI → burn0
+and the npm packages; Programmatic SEO → Paper Pilot and BeonAI.
 
-The user was offered a full re-derivation of all 37 projects' `skills` arrays from
-their tagging table (in the previous chat's history) plus assignment of these ten,
-and had not yet answered. Intended mapping: ML/CV → the 2019 Python and OpenCV work;
-Databases/Queues → the flagships; WebGL → Three.js and music-balls; Smart Contracts →
-Basketo; CLI → burn0 and the npm packages; Programmatic SEO → Paper Pilot and BeonAI.
+**Home page — assessed but not touched.** In priority order:
 
-Other open items:
+- `😊😊` is **doubled**, and is the only colour on an otherwise monochrome page.
+- All four hero lines are at the same scale, so the statement never resolves.
+  "6+ years making ideas real" wants to be roughly half size.
+- Three hero links point at `/work?filter=ai|software|companies`. **Nothing reads
+  that param**, and `/work` re-ranks rather than filters by design, so the concept
+  no longer exists.
+- Text is flush to the left edge (~25px on a 2000px viewport) with the right half
+  empty, and ~390px of dead space between nav and first line.
+- Nav is **22 lines duplicated verbatim** in `src/app/page.tsx` and
+  `src/app/skills/page.tsx`, differing only in which link is `.active`. It is absent
+  entirely from `/work` and `/journey`. Should be a component.
+- The About nav link is `<a href="#about">`, so from `/skills` it resolves to
+  `/skills#about` — broken anywhere but home.
 
-- **`/work/basketo` does not exist** — Basketo's `CASE STUDY →` link 404s. Link kinds
-  are `case-study | live | play`, and the user's rule is that **every** destination is
-  an internal page; the gallery never links off-site.
-- **`AlifArt` font stack is `"General Sans", "Inter", …`** and neither is loaded, so
-  it falls to Helvetica Neue on macOS and Arial elsewhere. Either load General Sans
-  via `next/font/local` or add Inter via `next/font/google`.
-- **Five pixel fonts load on every page and nothing uses them** — Doto, Geist Pixel,
-  Pixelify Sans, Raleway Dots, VT323, all in `layout.tsx`. Also, Geist Pixel has no
-  metrics in Next's table, so it warns at build and will cause layout shift.
-- **57MB of card PNGs**, 1024×1536 unoptimised. WebP would cut ~75%.
-- **`public/domain/creaive_gaming.png`** has a typo in the filename; the art map
-  points at it as-is deliberately. Rename both if you want it fixed.
-- **`public/skills/next.png` is unused** — `Next.js` points at `next1.png`.
-- **`page.tsx` metadata still says "Project Hunter"**, a name retired from the UI.
-- `public/maplibre-gl-*.mjs.map` — 4.5MB of source maps publicly served.
+**`/journey` and `/skills` are orphaned.** Both were hidden from the nav and the
+hero CTA was repointed to `/work`, so neither has an inbound link anywhere. Both
+still build and resolve by URL. Decide whether they are retired or re-linked.
+
+**Four pre-existing lint errors**, none introduced this session:
+
+- `AboutDrawer.tsx:46` — `closeDrawer` accessed before declaration inside an effect,
+  so the effect captures a stale binding
+- `LocationMap.tsx:55` — same pattern, plus an `any` at :64
+- `TimeBasedCelestial.tsx:20` — `setState` called synchronously in an effect body
+
+Smaller items:
+
+- **`AlifArt`'s font stack is `"General Sans", "Inter", …`** and neither is loaded,
+  so it falls back to Helvetica Neue. Geist Sans and Geist Mono *are* loaded and are
+  what every other artwork uses — switch it or load the real face.
+- **`public/domain/creaive_gaming.webp`** has a typo in the filename; the art map
+  points at it as-is deliberately.
+- **`public/maplibre-gl-*.mjs.map`** — 4 source map files publicly served.
+- `images.minimumCacheTTL` is set to **60s** in `next.config.ts` while reel artwork
+  is in flux. Raise it once the art settles.
+- `shipping.webp` was deleted as unreferenced — `SKILL_REEL` has no "Shipping"
+  entry, the silent-`str.replace` casualty from the previous session. Recoverable
+  from `git show 08e318f:public/skills/shipping.png`.
+- The PNGs live on in history at `08e318f`; only the working tree and deploys got
+  lighter. Clean up large binaries *before* the first push next time.
 
 ---
 
 ## 8. Copy and identity decisions
 
-The left column is deliberately spare: back link → `<h1>` → machine → hint. A large
-display title was tried and rejected twice; the `<h1>` is `Work / 2017 — Now` at
-label scale (10px mono), and the project cards are `<h2>` so the outline is
-contiguous.
+**Blurbs are a fixed shape: a 4–5 word subject, then a 5–8 word proof clause,
+joined by a participial phrase.** All 37 follow it. Validate by splitting on the
+**first** comma — several have interior commas in the proof half.
 
-Rejected and worth not re-proposing: a Newsreader serif lede (removed, font unloaded),
-a stats line in mono (mixed fonts disliked), "Proof of Work" as a display title, and
-any copy that describes the slot machine rather than the person.
+burn0's blurb previously claimed "5K+ downloads". Real figure is ~3,100 all-time;
+`social-proof.tsx` in that repo hardcodes numbers off by ~30× and is dead code.
+Don't harvest stats from it.
 
-The user's name appears nowhere on the page by choice — the back link covers it.
+Titles: the root layout supplies `template: "%s — Syed Rafi Naqvi"` to every child
+segment, so **pages must not append a name of their own** — three did, and rendered
+it twice. The home page is in the root segment and so does not receive the template.
+
+Naming is inconsistent: "Rafi Naqvi" on home, "Syed Rafi Naqvi" in the layout and
+`about.ts`.
+
+The left column of `/work` is deliberately spare. Rejected and worth not
+re-proposing: a Newsreader serif lede, a stats line in mono, "Proof of Work" as a
+display title, and any copy that describes the slot machine rather than the person.
