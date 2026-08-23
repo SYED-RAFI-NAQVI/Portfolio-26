@@ -42,3 +42,7 @@ next-env.d.ts
 
 # editor
 .vscode/
+
+# Source artwork for the game cards. The shipped WebP lives in
+# public/work/ — these are the 20MB originals, kept locally only.
+/art-source/

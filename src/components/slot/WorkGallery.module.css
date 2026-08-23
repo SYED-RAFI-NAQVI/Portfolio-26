@@ -60,6 +60,22 @@
   box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.09);
 }
 
+/* Playable cards carry the same gold the player does, so the card and the
+   window it opens read as one object. Ring and glow only — the fill stays
+   black like every other card. */
+.card[data-playable="true"] {
+  box-shadow:
+    inset 0 0 0 1px rgba(227, 192, 122, 0.3),
+    inset 0 1px 0 rgba(246, 227, 172, 0.16),
+    0 0 34px rgba(227, 192, 122, 0.06);
+}
+.card[data-playable="true"]:hover {
+  box-shadow:
+    inset 0 0 0 1px rgba(227, 192, 122, 0.52),
+    inset 0 1px 0 rgba(246, 227, 172, 0.22),
+    0 0 44px rgba(227, 192, 122, 0.12);
+}
+
 /* De-emphasised, never removed — the collection stays legible as a whole. */
 .card[data-dim="true"] {
   opacity: 0.34;
@@ -162,6 +178,39 @@
   transition: transform 600ms cubic-bezier(0.2, 0.85, 0.25, 1);
 }
 .card:hover .coverImg { transform: scale(1.03); }
+
+/* Game key art carries its own title, so it must never be cropped — a
+   stretched row would otherwise cut the wordmark off. `contain` centres it
+   and the card's painted `ground` absorbs the slack, which is what `ground`
+   was there for. Scoped to playable cards so cover-cropped photography
+   elsewhere keeps its full-bleed treatment. */
+.card[data-playable="true"] .coverImg { object-fit: contain; }
+
+/* Game key art is a fixed-aspect poster with its title drawn in, so unlike
+   the coded artwork it must never be stretched or cropped — the box stays at
+   the image's own 16/10 and a stretched row's slack goes back to .body, where
+   .cardFoot's `margin-top: auto` collects it under the blurb exactly as it
+   does on the text-only cards. */
+.card[data-playable="true"] .cover { flex-grow: 0; }
+.card[data-playable="true"] .body { flex: 1; }
+
+/* The artwork breaks out to the card's full width and so paints over the
+   card's inset ring along three edges. On a monochrome card the stock
+   rgba(255,255,255,0.07) border stands in for that ring convincingly; on a
+   playable card the ring is gold, so a near-invisible white line reads as the
+   frame simply stopping where the image starts. Matching the ring's colour
+   makes the artwork's edge continue it instead of erasing it. */
+.card[data-playable="true"] .coverBanner {
+  border-color: rgba(227, 192, 122, 0.3);
+  /* No bottom edge: the artwork continues the card's ring on three sides and
+     then hands off to the body. Closing it underneath would draw a fourth
+     edge the card doesn't have, and the card would read as two stacked boxes
+     rather than one with art at the top. */
+  border-bottom: 0;
+}
+.card[data-playable="true"]:hover .coverBanner {
+  border-color: rgba(227, 192, 122, 0.52);
+}
 
 .body {
   display: flex;

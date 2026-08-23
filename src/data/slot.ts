@@ -187,6 +187,13 @@ export type Project = {
   href?: string;
   /** Screenshot shown at the head of the card. */
   cover?: string;
+  /**
+   * A deployed, playable build. Present only where the project really is a
+   * game — `domain: "Creative / Gaming"` covers demos and toys too, so it is
+   * not a reliable test. The URL is embedded in an iframe, which means the
+   * host must not send `X-Frame-Options` or a restrictive `frame-ancestors`.
+   */
+  play?: string;
   /** Internal destinations. Projects without any render no actions. */
   links?: ProjectLink[];
   /**
@@ -496,6 +503,8 @@ export const projects: Project[] = [
   },
   {
     id: "three-js-text",
+    cover: "/work/three-js-text.webp",
+    play: "https://three-js-text-geomentry.vercel.app/",
     name: "Three.js Text Geometry",
     role: "Personal project",
     period: "2021",
@@ -506,6 +515,8 @@ export const projects: Project[] = [
   },
   {
     id: "colorize",
+    cover: "/work/colorize.webp",
+    play: "https://colorize-swart.vercel.app/",
     name: "colorize",
     role: "Personal project",
     period: "2021",
@@ -527,6 +538,8 @@ export const projects: Project[] = [
   },
   {
     id: "hacker-news",
+    cover: "/work/hacker-news.webp",
+    play: "https://hacker-news-clone-one-red.vercel.app/",
     name: "Hacker News Clone",
     role: "Personal project",
     period: "2020",
@@ -557,6 +570,8 @@ export const projects: Project[] = [
   },
   {
     id: "text-editor",
+    cover: "/work/text-editor.webp",
+    play: "https://text-editor-silk-kappa.vercel.app/",
     name: "Text Editor",
     role: "Personal project",
     period: "2019",
@@ -658,6 +673,8 @@ export const projects: Project[] = [
   },
   {
     id: "music-player",
+    cover: "/work/music-player.webp",
+    play: "https://music-player-mu-rouge.vercel.app/",
     name: "MUSIC-PLAYER",
     role: "Personal project",
     period: "2018",
@@ -668,6 +685,8 @@ export const projects: Project[] = [
   },
   {
     id: "cs-leets",
+    cover: "/work/cs-leets.webp",
+    play: "https://cs-leets.vercel.app/",
     name: "CS-LEETS",
     role: "Personal project",
     period: "2018",
@@ -678,6 +697,8 @@ export const projects: Project[] = [
   },
   {
     id: "need-for-speed",
+    cover: "/work/need-for-speed.webp",
+    play: "https://need-for-speed-amber.vercel.app/",
     name: "NEED-FOR-SPEED",
     role: "Personal project",
     period: "2018",
@@ -688,6 +709,8 @@ export const projects: Project[] = [
   },
   {
     id: "space-x",
+    cover: "/work/space-x.webp",
+    play: "https://space-x-rho-fawn.vercel.app/",
     name: "SPACE-X",
     role: "Personal project",
     period: "2018",
@@ -698,6 +721,8 @@ export const projects: Project[] = [
   },
   {
     id: "music-balls",
+    cover: "/work/music-balls.webp",
+    play: "https://music-balls.vercel.app/",
     name: "music-balls",
     role: "Personal project · Open Source",
     period: "2018",
@@ -708,6 +733,8 @@ export const projects: Project[] = [
   },
   {
     id: "todo-list",
+    cover: "/work/todo-list.webp",
+    play: "https://to-do-list-app-iota-gules.vercel.app/",
     name: "TO-DO-LIST-APP",
     role: "Personal project",
     period: "2018",
@@ -718,6 +745,8 @@ export const projects: Project[] = [
   },
   {
     id: "rgb-color-game",
+    cover: "/work/rgb-color-game.webp",
+    play: "https://rgb-color-game-neon.vercel.app/",
     name: "RGB Color Game",
     role: "Personal project",
     period: "2018",

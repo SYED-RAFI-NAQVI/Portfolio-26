@@ -59,5 +59,21 @@ export const ART: Record<string, ArtEntry> = {
   paperpilot: { Component: PaperPilotArt, slot: "top", bare: true, ground: "#0b0907" },
   burn0: { Component: Burn0Art, slot: "middle", bare: true, ground: "#09090b" },
   basketo: { slot: "bottom", bare: true, ground: "#020605" },
+
+  /* Playable builds. Each is poster key art with the title drawn into it, so
+     `bare` hides the card head's copy of the name and the artwork leads the
+     card. Uniformly "top" — unlike the coded artwork above, these are a set,
+     and a shelf of game covers should look like a shelf. */
+  "music-balls": { slot: "top", bare: true, ground: "#010102" },
+  "text-editor": { slot: "top", bare: true, ground: "#000000" },
+  "music-player": { slot: "top", bare: true, ground: "#010102" },
+  "three-js-text": { slot: "top", bare: true, ground: "#040405" },
+  "hacker-news": { slot: "top", bare: true, ground: "#010102" },
+  "cs-leets": { slot: "top", bare: true, ground: "#000000" },
+  "rgb-color-game": { slot: "top", bare: true, ground: "#010102" },
+  "todo-list": { slot: "top", bare: true, ground: "#070808" },
+  "space-x": { slot: "top", bare: true, ground: "#000000" },
+  colorize: { slot: "top", bare: true, ground: "#010102" },
+  "need-for-speed": { slot: "top", bare: true, ground: "#010103" },
 };
 

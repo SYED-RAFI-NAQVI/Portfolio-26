@@ -18,6 +18,14 @@
   --link:      #3b9eff;
   --link-deep: #60b0ff;
 
+  /* Playable. Gold is the one colour that means "this thing runs" — it marks
+     playable cards, the play control and the player chrome, and nothing else.
+     Console-plate gold, kept to edges, text and light; never a fill. */
+  --gold:      #e3c07a;
+  --gold-deep: #a67c2e;
+  --gold-lit:  #f6e3ac;
+  --gold-veil: rgba(227, 192, 122, 0.13);
+
   /* Radius */
   --r-sm:   6px;
   --r-md:   12px;

@@ -1,8 +1,9 @@
 "use client";
 
 import Image from "next/image";
-import { useLayoutEffect, useMemo, useRef } from "react";
+import { useCallback, useLayoutEffect, useMemo, useRef, useState } from "react";
 import styles from "./WorkGallery.module.css";
+import { GamePlayer, PlayButton, type PlayableGame } from "../game/GamePlayer";
 import { ART, type ArtSlot } from "./art/registry";
 import Link from "next/link";
 import {
@@ -121,11 +122,13 @@ function Card({
   active,
   span,
   register,
+  onPlay,
 }: {
   match: Match;
   active: boolean;
   span: number;
   register: (el: HTMLElement | null) => void;
+  onPlay: (game: PlayableGame) => void;
 }) {
   const { project, score } = match;
 
@@ -168,6 +171,7 @@ function Card({
       data-feature={score === 3 ? "true" : "false"}
       data-cover={Art || project.cover ? "true" : "false"}
       data-light-art={art?.light ? "true" : "false"}
+      data-playable={project.play ? "true" : "false"}
       data-art-slot={hasArt ? slot : undefined}
       style={{ gridColumn: `span ${span}` }}
     >
@@ -215,8 +219,18 @@ function Card({
 
       {slot === "bottom" && coverNode}
 
-      {(project.links?.length || project.href) && (
+      {(project.links?.length || project.href || project.play) && (
         <footer className={styles.cardFoot}>
+          {/* Playable builds lead the row — it is the only action on a card
+              that keeps you here rather than sending you somewhere. */}
+          {project.play && (
+            <PlayButton
+              onPlay={() =>
+                onPlay({ url: project.play as string, title: project.name })
+              }
+            />
+          )}
+
           {project.links?.map((l, n) => (
             <Link
               key={l.kind}
@@ -256,12 +270,26 @@ function Card({
 export function WorkGallery({
   result,
   spinning,
+  gamesFirst = false,
 }: {
   result: SpinResult | null;
   spinning: boolean;
+  /** Float the playable builds to the top of the collection. Everything else
+   *  stays mounted below in its usual order — the gallery re-ranks rather
+   *  than filters, so arriving from the games badge must not look like the
+   *  archive lost thirty projects. */
+  gamesFirst?: boolean;
 }) {
   const combo = result?.combo ?? null;
-  const ranked = useMemo(() => rankProjects(combo), [combo]);
+  const ranked = useMemo(() => {
+    const all = rankProjects(combo);
+    if (!gamesFirst) return all;
+    // Sort is stable, so a spin's ranking still decides the order inside each
+    // group — playable work leads, the rest follows exactly as it would have.
+    return [...all].sort(
+      (a, b) => Number(Boolean(b.project.play)) - Number(Boolean(a.project.play)),
+    );
+  }, [combo, gamesFirst]);
   const order = useMemo(() => ranked.map((m) => m.project.id), [ranked]);
 
   // Re-composed on every spin, so widths move with the ranking.
@@ -276,6 +304,10 @@ export function WorkGallery({
 
   const register = useFlip(order);
 
+  const [game, setGame] = useState<PlayableGame | null>(null);
+  // Stable, so a card's PlayButton is not a new callback on every re-rank.
+  const closeGame = useCallback(() => setGame(null), []);
+
   return (
     <section className={styles.collection} aria-label="Work">
       <div className={styles.grid} data-spinning={spinning ? "true" : "false"}>
@@ -286,9 +318,12 @@ export function WorkGallery({
             active={!!result}
             span={spans[i] ?? 3}
             register={register(m.project.id)}
+            onPlay={setGame}
           />
         ))}
       </div>
+
+      <GamePlayer game={game} onClose={closeGame} />
     </section>
   );
 }
