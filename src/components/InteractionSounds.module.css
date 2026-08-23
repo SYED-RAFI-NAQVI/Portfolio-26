@@ -1,8 +1,7 @@
 .soundPrompt {
   position: fixed;
-  left: 50%;
+  left: 24px;
   bottom: 24px;
-  transform: translateX(-50%);
 
   z-index: 100;
 
@@ -44,23 +43,28 @@
 
 .hidden {
   opacity: 0;
-  transform: translate(-50%, 5px);
+  transform: translateY(5px);
   pointer-events: none;
 }
 
 .soundToggle {
   position: fixed;
-  left: 50%;
+  left: 24px;
   bottom: 24px;
-  transform: translateX(-50%) translateY(10px);
+  transform: translateY(10px);
   z-index: 100;
-  
+
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 9px;
+  height: 30px;
+  padding: 0 12px;
 
-  background: transparent;
-  border: none;
+  /* Was transparent text at 55% white — it read as a caption rather than
+     something you could press. */
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 100px;
   cursor: pointer;
 
   font-family: var(--font-geist-mono), monospace;
@@ -68,24 +72,73 @@
   font-weight: 600;
   letter-spacing: 0.12em;
 
-  color: rgba(255, 255, 255, 0.55);
-  
+  color: #c9c9c9;
+
   opacity: 0;
   pointer-events: none;
   transition:
     opacity 400ms ease,
     transform 400ms cubic-bezier(.22, 1, .36, 1),
-    color 200ms ease;
+    color 200ms ease,
+    background 200ms ease,
+    border-color 200ms ease;
 }
 
 .soundToggle:hover {
-  color: rgba(255, 255, 255, 1);
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.09);
+  border-color: rgba(255, 255, 255, 0.28);
 }
+.soundToggle:active { transform: translateY(1px); }
+.soundToggle:focus-visible { outline: 2px solid #ffffff; outline-offset: 3px; }
 
 .soundToggle.visible {
   opacity: 1;
   pointer-events: auto;
-  transform: translateX(-50%) translateY(0);
+  transform: translateY(0);
+}
+
+.label { line-height: 1; }
+
+/* ─── Level meter ──────────────────────────────────────────────────────
+   Four bars on a shared keyframe with staggered delays and durations, so
+   they never line up into a single pulse. Muted collapses them to a flat
+   row and stops the animation rather than hiding anything, so the control
+   keeps its width and the row does not jump on toggle. */
+.meter {
+  display: flex;
+  align-items: flex-end;
+  gap: 2px;
+  height: 13px;
+}
+
+.meter i {
+  display: block;
+  width: 2px;
+  height: 3px;
+  border-radius: 1px;
+  background: currentColor;
+  transform-origin: bottom;
+  animation: soundLevel 900ms ease-in-out infinite;
+}
+.meter i:nth-child(1) { animation-duration: 780ms; animation-delay: -120ms; }
+.meter i:nth-child(2) { animation-duration: 1040ms; animation-delay: -420ms; }
+.meter i:nth-child(3) { animation-duration: 660ms; animation-delay: -260ms; }
+.meter i:nth-child(4) { animation-duration: 920ms; animation-delay: -540ms; }
+
+@keyframes soundLevel {
+  0%, 100% { height: 3px; }
+  50% { height: 13px; }
+}
+
+.soundToggle[data-muted="true"] { color: #7d8286; }
+.soundToggle[data-muted="true"] .meter i {
+  animation: none;
+  height: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .meter i { animation: none; height: 7px; }
 }
 
 .mobile {
@@ -102,24 +155,4 @@
   }
 }
 
-.icon {
-  width: 16px;
-  height: 16px;
-  background-color: currentColor;
-  mask-size: contain;
-  mask-repeat: no-repeat;
-  mask-position: center;
-  -webkit-mask-size: contain;
-  -webkit-mask-repeat: no-repeat;
-  -webkit-mask-position: center;
-}
 
-.iconOn {
-  mask-image: url("/sound-on.svg");
-  -webkit-mask-image: url("/sound-on.svg");
-}
-
-.iconOff {
-  mask-image: url("/sound-off.svg");
-  -webkit-mask-image: url("/sound-off.svg");
-}

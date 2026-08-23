@@ -34,14 +34,6 @@ export default function SkillsPage() {
             <span className={styles.navIcon} style={{ maskImage: "url('/nav-work.svg')", WebkitMaskImage: "url('/nav-work.svg')" }} />
             Work
           </Link>
-          <Link href="/journey">
-            <span className={styles.navIcon} style={{ maskImage: "url('/nav-journey.svg')", WebkitMaskImage: "url('/nav-journey.svg')" }} />
-            Journey
-          </Link>
-          <Link href="/skills" className={styles.active}>
-            <span className={styles.navIcon} style={{ maskImage: "url('/nav-skills.svg')", WebkitMaskImage: "url('/nav-skills.svg')" }} />
-            Skills
-          </Link>
           <a href="#about">
             <span className={styles.navIcon} style={{ maskImage: "url('/nav-about.svg')", WebkitMaskImage: "url('/nav-about.svg')" }} />
             About

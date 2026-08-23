@@ -249,12 +249,12 @@
   100% { opacity: 1; }
 }
 
-.journeyBreak {
+.ctaBreak {
   display: block;
   margin-top: 0.08em;
 }
 
-.bioLink.journey .label {
+.bioLink.cta .label {
   font-family: var(--font-dot-gothic), sans-serif;
   letter-spacing: -0.025em;
   color: #ececec;

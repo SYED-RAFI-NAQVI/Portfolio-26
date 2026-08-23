@@ -38,14 +38,6 @@ export default function Home() {
             <span className={styles.navIcon} style={{ maskImage: "url('/nav-work.svg')", WebkitMaskImage: "url('/nav-work.svg')" }} />
             Work
           </Link>
-          <Link href="/journey">
-            <span className={styles.navIcon} style={{ maskImage: "url('/nav-journey.svg')", WebkitMaskImage: "url('/nav-journey.svg')" }} />
-            Journey
-          </Link>
-          <Link href="/skills">
-            <span className={styles.navIcon} style={{ maskImage: "url('/nav-skills.svg')", WebkitMaskImage: "url('/nav-skills.svg')" }} />
-            Skills
-          </Link>
           <a href="#about">
             <span className={styles.navIcon} style={{ maskImage: "url('/nav-about.svg')", WebkitMaskImage: "url('/nav-about.svg')" }} />
             About
@@ -85,14 +77,14 @@ export default function Home() {
             <span className={styles.label}>companies</span>
           </Link>
           . <span className={styles.soft}>6+ years making ideas real.</span>
-          <span className={styles.journeyBreak}>
+          <span className={styles.ctaBreak}>
             <Link
-              className={`${styles.bioLink} ${styles.journey}`}
-              href="/journey"
-              data-sfx="journey"
+              className={`${styles.bioLink} ${styles.cta}`}
+              href="/work"
+              data-sfx="work"
               data-hover-sound="ambient"
             >
-              <span className={styles.label}>&gt;&thinsp;Explore the journey.</span>
+              <span className={styles.label}>&gt;&thinsp;Explore the work.</span>
             </Link>
           </span>
         </h1>

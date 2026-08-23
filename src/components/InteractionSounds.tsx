@@ -64,17 +64,28 @@ export function InteractionSounds() {
         className={`${styles.soundPrompt} ${unlocked ? styles.hidden : ""}`}
         aria-hidden="true"
       >
-        <span className={styles.desktop}>CLICK ANYWHERE FOR SOUND</span>
-        <span className={styles.mobile}>TAP ANYWHERE FOR SOUND</span>
+        <span className={styles.desktop}>CLICK FOR SOUND</span>
+        <span className={styles.mobile}>TAP FOR SOUND</span>
       </div>
 
       <button
         className={`${styles.soundToggle} ${unlocked ? styles.visible : ""}`}
         onClick={handleToggle}
         aria-label={muted ? "Unmute sound" : "Mute sound"}
+        aria-pressed={!muted}
+        data-muted={muted ? "true" : "false"}
       >
-        <span>SOUND</span>
-        <span className={`${styles.icon} ${muted ? styles.iconOff : styles.iconOn}`} />
+        <span className={styles.label}>SOUND</span>
+
+        {/* A level meter rather than a speaker glyph: the bars run while
+            audio is on and settle flat when it is not, so the state is
+            legible without reading the icon. */}
+        <span className={styles.meter} aria-hidden="true">
+          <i />
+          <i />
+          <i />
+          <i />
+        </span>
       </button>
     </>
   );
