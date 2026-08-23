@@ -100,3 +100,54 @@
   .control,
   .split > :last-child { overflow-y: visible; }
 }
+
+/* ─── Playable-only chip ───────────────────────────────────────
+   Set by the home page's games badge. The gallery re-ranks rather
+   than filters everywhere else, so an active filter has to be
+   visible and dismissible — otherwise the collection looks like it
+   lost most of its work.
+   ------------------------------------------------------------- */
+
+.gamesChip {
+  align-self: flex-start;
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 18px;
+  padding: 0 10px 0 12px;
+  height: 28px;
+
+  border: 1px solid rgba(227, 192, 122, 0.34);
+  border-radius: var(--r-pill, 100px);
+  background: rgba(227, 192, 122, 0.06);
+  cursor: pointer;
+
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  color: var(--gold-lit, #f6e3ac);
+
+  transition: border-color 180ms ease, background 180ms ease;
+}
+.gamesChip:hover {
+  border-color: var(--gold, #e3c07a);
+  background: rgba(227, 192, 122, 0.12);
+}
+
+.gamesDot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--gold, #e3c07a);
+  box-shadow: 0 0 8px rgba(227, 192, 122, 0.7);
+}
+
+.gamesClear {
+  font-size: 13px;
+  line-height: 1;
+  color: var(--gold-deep, #a67c2e);
+}
+.gamesChip:hover .gamesClear {
+  color: var(--gold-lit, #f6e3ac);
+}

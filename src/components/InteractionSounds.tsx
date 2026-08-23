@@ -63,6 +63,7 @@ export function InteractionSounds() {
       <div
         className={`${styles.soundPrompt} ${unlocked ? styles.hidden : ""}`}
         aria-hidden="true"
+        data-sound-prompt=""
       >
         <span className={styles.desktop}>CLICK FOR SOUND</span>
         <span className={styles.mobile}>TAP FOR SOUND</span>
@@ -74,6 +75,9 @@ export function InteractionSounds() {
         aria-label={muted ? "Unmute sound" : "Mute sound"}
         aria-pressed={!muted}
         data-muted={muted ? "true" : "false"}
+        /* Stable hook for anything that needs to sit beside this control —
+           CSS-module class names are hashed and cannot be queried. */
+        data-sound-toggle=""
       >
         <span className={styles.label}>SOUND</span>
 

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useCallback, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import styles from "./WorkExplorer.module.css";
 import { SlotMachine } from "./SlotMachine";
 import { WorkGallery } from "./WorkGallery";
@@ -17,6 +18,22 @@ import type { SpinResult } from "../../data/slot";
 export function WorkExplorer() {
   const [result, setResult] = useState<SpinResult | null>(null);
   const [spinning, setSpinning] = useState(false);
+
+  /**
+   * `?games=1` floats the playable builds to the top of the collection — the
+   * home page's games badge is the only thing that sets it. Nothing is removed;
+   * the rest of the archive stays below. Held in state rather than read from
+   * the URL on every render so dismissing it does not depend on the navigation
+   * landing first.
+   */
+  const params = useSearchParams();
+  const router = useRouter();
+  const [gamesFirst, setGamesFirst] = useState(params.get("games") === "1");
+
+  const clearGames = useCallback(() => {
+    setGamesFirst(false);
+    router.replace("/work", { scroll: false });
+  }, [router]);
 
   /**
    * Remount key for the machine.
@@ -66,11 +83,23 @@ export function WorkExplorer() {
             canReset={result !== null}
           />
 
+          {gamesFirst && (
+            <button
+              type="button"
+              className={styles.gamesChip}
+              onClick={clearGames}
+            >
+              <span className={styles.gamesDot} aria-hidden="true" />
+              PLAYABLE FIRST
+              <span className={styles.gamesClear} aria-hidden="true">×</span>
+            </button>
+          )}
+
           <p className={styles.foot}>DRAG THE KNOB DOWN</p>
         </div>
       </aside>
 
-      <WorkGallery result={result} spinning={spinning} />
+      <WorkGallery result={result} spinning={spinning} gamesFirst={gamesFirst} />
     </div>
   );
 }

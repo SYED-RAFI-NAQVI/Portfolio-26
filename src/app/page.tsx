@@ -6,6 +6,7 @@ import { DotMatrixPlant } from "../components/home/DotMatrixPlant";
 import { DotMatrixCloud } from "../components/home/DotMatrixCloud";
 import { TimeBasedCelestial } from "../components/home/TimeBasedCelestial";
 import { InteractionSounds } from "../components/InteractionSounds";
+import { GamesBadge } from "../components/home/GamesBadge";
 import { AboutDrawer } from "../components/about/AboutDrawer";
 
 export const metadata: Metadata = {
@@ -17,6 +18,7 @@ export default function Home() {
   return (
     <div className={styles.page}>
       <InteractionSounds />
+      <GamesBadge />
       <header className={styles.header}>
         <div className={styles.avatarWrap}>
           <a href="#about">
