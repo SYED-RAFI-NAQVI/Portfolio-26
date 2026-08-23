@@ -1,0 +1,159 @@
+/* ─── Skill face ───────────────────────────────────────────────
+   A holographic card. The artwork is the subject; two foil layers
+   blended `color-dodge` sit over it and are scrolled by the
+   pointer at different rates.
+
+   `color-dodge` is the whole technique: it brightens the artwork's
+   own colour rather than painting over it, so the foil flares
+   where the image is already lit and stays black where it isn't.
+   That is what makes the light read as coming out of the card. It
+   also clips to white very fast, which is why both layers carry a
+   `brightness()` under 1 — that filter is holding the flare in
+   range, not dimming it for taste.
+   ------------------------------------------------------------- */
+
+.card {
+  --rx: 0deg;
+  --ry: 0deg;
+  --band-x: 50%;
+  --band-y: 50%;
+  --spark-x: 50%;
+  --spark-y: 50%;
+  --lit: 0;
+
+  /* White into green-cyan. Two genuinely different hues rather than two
+     whites, so the band reads as a reflection turning across the surface
+     instead of a flat cut-out sliding over it. */
+  --foil-1: #ffffff;
+  --foil-2: #ddf4ee;
+
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+
+  /* The artwork's own 2:3, so nothing is cropped in either direction — every
+     face is framed as it was drawn. Capped rather than filling the grid
+     column, so the row breathes instead of the cards butting up wide. */
+  width: 100%;
+  max-width: 200px;
+  aspect-ratio: 2 / 3;
+
+  overflow: hidden;
+  background: #050506;
+  border: 1px solid var(--hairline);
+
+  /* Perspective lives on the transform rather than a parent, so each card
+     turns about its own centre. A shared parent perspective would make cards
+     at the edge of a row skew toward a vanishing point they do not own. */
+  transform: perspective(800px) rotateX(var(--rx)) rotateY(var(--ry));
+  transform-style: preserve-3d;
+
+  /* Both foil layers blend against this card's artwork and nothing else. */
+  isolation: isolate;
+
+  will-change: transform;
+
+  /* Two speeds from one declaration: while tracking, --turn stays short so the
+     surface reads as attached to the cursor; on release the handler swaps in a
+     longer duration and the card settles back with weight. */
+  transition:
+    transform var(--turn, 90ms) ease-out,
+    box-shadow 240ms ease;
+}
+
+.card:hover {
+  /* Depth only. No coloured bloom behind the card — the foil is the light,
+     and a halo around the edge just competes with it. */
+  box-shadow: 0 28px 48px -24px rgba(0, 0, 0, 0.95);
+}
+
+/* The artwork runs near-black across most of the set and needs lifting — the
+   reel faces do exactly this to the same files. Applied to the image rather
+   than the card, so it does not also amplify the foil layers, whose own
+   brightness is calibrated against color-dodge clipping. */
+.art {
+  object-fit: cover;
+  object-position: center;
+  filter: brightness(1.22) contrast(1.06);
+  transition: filter 300ms ease;
+}
+.card:hover .art {
+  filter: brightness(1.34) contrast(1.08);
+}
+
+/* Bottom scrim, so the label survives artwork of any brightness. */
+.card::after {
+  content: "";
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 46%;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.82) 0%,
+    rgba(0, 0, 0, 0.46) 44%,
+    transparent 100%
+  );
+  pointer-events: none;
+  z-index: 1;
+}
+
+.name {
+  /* Above the foil: the light plays over the artwork, never over the name. */
+  position: relative;
+  z-index: 3;
+  width: 100%;
+  margin: 0;
+  padding: 0 12px 16px;
+  font-family: var(--font-doto), monospace;
+  font-size: 15px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  line-height: 1.2;
+  text-align: center;
+  text-transform: uppercase;
+  color: #f4f2ef;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.95);
+  /* Drifts against the tilt so it sits above the face rather than printed on
+     it, and brightens as the card catches light. */
+  transform: translate3d(var(--shift-x, 0), var(--shift-y, 0), 0);
+  transition:
+    transform var(--turn, 90ms) ease-out,
+    color 260ms ease,
+    text-shadow 260ms ease;
+}
+
+.card:hover .name {
+  color: #ffffff;
+  /* Stacked tight-to-wide: a near-solid core that thickens the letterforms,
+     then two blooms, then the mint halo. The dark backing stays first so the
+     name survives the bright faces. */
+  text-shadow:
+    0 1px 8px rgba(0, 0, 0, 0.9),
+    0 0 4px rgba(255, 255, 255, 0.95),
+    0 0 12px rgba(255, 255, 255, 0.85),
+    0 0 26px rgba(255, 255, 255, 0.6),
+    0 0 46px rgba(226, 246, 241, 0.8);
+}
+
+/* Off wherever it cannot work properly.
+
+   `hover: hover` is the load-bearing one: on a touch screen `pointermove`
+   fires on tap but `pointerleave` frequently does not, so a tapped card would
+   tilt and stay tilted with no way to release it. Reduced motion and coarse
+   pointers go the same way; the foil disables itself alongside. */
+@media (prefers-reduced-motion: reduce), (hover: none), (pointer: coarse) {
+  .card {
+    transform: none;
+    transition: box-shadow 240ms ease;
+  }
+}
+
+/* The slot a pulled card left behind. Kept in flow at full size so the grid
+   never reflows while the card is out — the gap is the point. */
+.card[data-pulled="true"] {
+  visibility: hidden;
+}
+
+.card {
+  cursor: pointer;
+}

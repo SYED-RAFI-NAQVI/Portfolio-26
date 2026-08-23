@@ -1,0 +1,95 @@
+/* ─── Foil ─────────────────────────────────────────────────────
+   Two layers blended `color-dodge` over a card's artwork, scrolled
+   by the pointer at different rates. Shared by the grid cards and
+   the expanded one so the two cannot drift apart.
+
+   `color-dodge` is the whole technique: it brightens the artwork's
+   own colour rather than painting over it, so the foil flares
+   where the image is already lit and stays black where it is not.
+   It also clips to white very fast, which is why both layers carry
+   a `brightness()` under 1 — that filter is holding the flare in
+   range, not dimming it for taste.
+
+   The custom properties come from whichever ancestor `useFoil` is
+   attached to; they inherit, so these layers need no positioning
+   knowledge of their own.
+   ------------------------------------------------------------- */
+
+/* ─── Foil, layer one: the band ───
+   A single wide sweep of light travelling across the face, tracking close to
+   the pointer. Oversized so only part of it is ever on the card. */
+.band {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+
+  background-image: linear-gradient(
+    110deg,
+    transparent 22%,
+    var(--foil-1) 46%,
+    var(--foil-2) 54%,
+    transparent 78%
+  );
+  background-size: 260% 260%;
+  background-position: var(--band-x) var(--band-y);
+  background-repeat: no-repeat;
+
+  mix-blend-mode: color-dodge;
+  filter: brightness(0.56) contrast(1.3) saturate(0.72);
+  opacity: calc(var(--lit) * 0.9);
+  transition: opacity var(--fade, 0ms) ease;
+}
+
+/* ─── Foil, layer two: the sheet ───
+   The iridescent grain underneath. It scrolls at a seventh of the band's rate,
+   and that difference is the parallax that makes the surface feel layered
+   rather than printed. */
+.spark {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+
+  background-image:
+    /* fine glitter */
+    repeating-radial-gradient(
+      circle at 17% 29%,
+      rgba(255, 255, 255, 0.5) 0 1px,
+      transparent 1px 7px
+    ),
+    /* diffraction grating */
+    repeating-linear-gradient(
+      98deg,
+      rgba(255, 255, 255, 0.14) 0 2px,
+      transparent 2px 5px
+    ),
+    /* White alternating with green-cyan, so the sheet shifts hue as it
+       travels rather than just getting brighter and dimmer. */
+    linear-gradient(
+      125deg,
+      rgba(255, 255, 255, 0.42) 10%,
+      rgba(221, 244, 238, 0.3) 28%,
+      rgba(255, 255, 255, 0.46) 46%,
+      rgba(228, 247, 242, 0.28) 66%,
+      rgba(255, 255, 255, 0.42) 88%
+    );
+  background-size: 180% 180%;
+  background-position: var(--spark-x) var(--spark-y);
+  background-blend-mode: overlay, overlay, normal;
+
+  mix-blend-mode: color-dodge;
+  filter: brightness(0.62) contrast(1.18) saturate(0.7);
+  opacity: calc(var(--lit) * 0.7);
+  transition: opacity var(--fade, 0ms) ease;
+}
+
+/* Off wherever it cannot work properly. `hover: hover` is the load-bearing
+   one: on a touch screen `pointermove` fires on tap but `pointerleave`
+   frequently does not, so the foil would light up and stay lit. */
+@media (prefers-reduced-motion: reduce), (hover: none), (pointer: coarse) {
+  .band,
+  .spark {
+    display: none;
+  }
+}

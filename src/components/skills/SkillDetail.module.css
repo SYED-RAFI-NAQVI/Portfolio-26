@@ -1,0 +1,262 @@
+/* ─── Skill detail ─────────────────────────────────────────────
+   A card off the shelf: it flies from its slot in the grid to the
+   right of the screen, turning once on the way, while the reading
+   panel slides in from the left.
+   ------------------------------------------------------------- */
+
+.stage {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  grid-template-columns: 3fr 7fr;
+  align-items: center;
+  gap: clamp(24px, 5vw, 80px);
+  padding: clamp(20px, 4vw, 64px);
+  /* The card turns a full revolution, so the stage has to be the thing that
+     gives it depth — without this the rotation reads as a flat squash. */
+  perspective: 1600px;
+}
+
+.backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(4, 4, 4, 0.86);
+  backdrop-filter: blur(8px);
+  opacity: 0;
+  transition: opacity 400ms ease;
+}
+.stage[data-open="true"] .backdrop {
+  opacity: 1;
+}
+
+/* ─── Reading panel ─── */
+
+.panel {
+  position: relative;
+  z-index: 1;
+  justify-self: stretch;
+  width: 100%;
+  max-height: 100%;
+  overflow-y: auto;
+  padding-right: clamp(8px, 3vw, 48px);
+  padding-left: clamp(4px, 1.5vw, 24px);
+
+  opacity: 0;
+  transform: translateX(40px);
+  transition:
+    opacity 420ms ease 120ms,
+    transform 520ms cubic-bezier(0.22, 1, 0.36, 1) 120ms;
+}
+.stage[data-open="true"] .panel {
+  opacity: 1;
+  transform: none;
+}
+
+.close {
+  position: absolute;
+  top: 0;
+  right: clamp(8px, 3vw, 48px);
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border: 1px solid var(--hairline);
+  border-radius: var(--r-sm, 6px);
+  background: transparent;
+  color: var(--body);
+  cursor: pointer;
+  transition: color 150ms ease, border-color 150ms ease;
+}
+.close:hover {
+  color: var(--ink);
+  border-color: var(--faint);
+}
+
+.eyebrow {
+  margin: 0 0 10px;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+
+.title {
+  margin: 0 0 6px;
+  font-family: var(--font-geist-sans), system-ui, sans-serif;
+  font-size: clamp(30px, 4vw, 46px);
+  font-weight: 500;
+  line-height: 1.06;
+  letter-spacing: -1.4px;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+.count {
+  margin: 0 0 26px;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--mute);
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  border-top: 1px solid var(--hairline);
+}
+
+.row {
+  display: flex;
+  align-items: baseline;
+  gap: 16px;
+  padding: 13px 0;
+  border-bottom: 1px solid var(--hairline);
+  color: var(--body);
+  text-decoration: none;
+  transition: color 150ms ease;
+}
+.row:hover {
+  color: var(--ink);
+}
+
+.rowName {
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.rowYear {
+  margin-left: auto;
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 10px;
+  letter-spacing: 0.1em;
+  color: var(--mute);
+}
+
+/* ─── The card on the stage ─── */
+
+.cardWrap {
+  position: relative;
+  z-index: 1;
+  /* Ahead of the panel in the layout, behind it in the markup: the panel is
+     the content, so it stays first in the reading and tab order. */
+  order: -1;
+  justify-self: stretch;
+
+  --rx: 0deg;
+  --ry: 0deg;
+  --band-x: 50%;
+  --band-y: 50%;
+  --spark-x: 50%;
+  --spark-y: 50%;
+  --lit: 0;
+  --foil-1: #ffffff;
+  --foil-2: #ddf4ee;
+
+  display: flex;
+  justify-content: center;
+  /* Tilt only. The card inside carries the fly-out transform, so the two
+     compose rather than overwrite one another. */
+  transform: rotateX(var(--rx)) rotateY(var(--ry));
+  transform-style: preserve-3d;
+  transition: transform var(--turn, 90ms) ease-out;
+}
+
+.card {
+  position: relative;
+  display: flex;
+  align-items: flex-end;
+  width: min(100%, calc(84vh * 2 / 3));
+  height: auto;
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
+  border: 1px solid var(--hairline);
+  background: #050506;
+  box-shadow: 0 50px 90px -40px rgba(0, 0, 0, 0.95);
+  /* Both foil layers blend against this card's artwork and nothing else. */
+  isolation: isolate;
+  /* Both faces of the turn are the same artwork, so the card must not vanish
+     through the half-revolution. */
+  backface-visibility: visible;
+}
+
+/* The artwork runs near-black across most of the set and needs lifting — the
+   reel faces do exactly this to the same files. Applied to the image rather
+   than the card, so it does not also amplify the foil layers, whose own
+   brightness is calibrated against color-dodge clipping. */
+.cardArt {
+  object-fit: cover;
+  object-position: center;
+  filter: brightness(1.22) contrast(1.06);
+}
+
+.cardScrim {
+  z-index: 1;
+  position: absolute;
+  inset: auto 0 0 0;
+  height: 46%;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.9) 0%,
+    rgba(0, 0, 0, 0.55) 44%,
+    transparent 100%
+  );
+  pointer-events: none;
+}
+
+.cardName {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  margin: 0;
+  padding: 0 18px 22px;
+  font-family: var(--font-doto), monospace;
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: 0.16em;
+  line-height: 1.2;
+  text-align: center;
+  text-transform: uppercase;
+  color: #f4f2ef;
+  text-shadow: 0 1px 10px rgba(0, 0, 0, 0.95);
+  /* Drifts against the tilt so it sits above the face rather than printed on
+     it, and brightens as the card catches light. */
+  transform: translate3d(var(--shift-x, 0), var(--shift-y, 0), 0);
+  transition:
+    transform var(--turn, 90ms) ease-out,
+    color 260ms ease,
+    text-shadow 260ms ease;
+}
+
+/* Matched to the grid card, so the name lights the same way in both places. */
+.cardWrap:hover .cardName {
+  color: #ffffff;
+  /* Stacked tight-to-wide: a near-solid core that thickens the letterforms,
+     then two blooms, then the mint halo. The dark backing stays first so the
+     name survives the bright faces. */
+  text-shadow:
+    0 1px 8px rgba(0, 0, 0, 0.9),
+    0 0 4px rgba(255, 255, 255, 0.95),
+    0 0 12px rgba(255, 255, 255, 0.85),
+    0 0 26px rgba(255, 255, 255, 0.6),
+    0 0 46px rgba(226, 246, 241, 0.8);
+}
+
+/* Below the split, the card would crowd the text off the screen entirely. */
+@media (max-width: 860px) {
+  .stage {
+    grid-template-columns: minmax(0, 1fr);
+    align-content: center;
+  }
+  .cardWrap {
+    display: none;
+  }
+  .panel {
+    justify-self: stretch;
+    width: 100%;
+  }
+}
