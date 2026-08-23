@@ -7,7 +7,9 @@ import { GamePlayer, PlayButton, type PlayableGame } from "../game/GamePlayer";
 import { ART, type ArtSlot } from "./art/registry";
 import Link from "next/link";
 import {
+  matchesFocus,
   rankProjects,
+  type Focus,
   type Match,
   type ProjectLinkKind,
   type SpinResult,
@@ -123,19 +125,24 @@ function Card({
   span,
   register,
   onPlay,
+  easy = false,
 }: {
   match: Match;
   active: boolean;
   span: number;
   register: (el: HTMLElement | null) => void;
   onPlay: (game: PlayableGame) => void;
+  easy?: boolean;
 }) {
   const { project, score } = match;
 
 
   const art = ART[project.id];
   const Art = art?.Component;
-  const slot: ArtSlot = art?.slot ?? "top";
+  /* Easy mode is one repeated shape by design — artwork on top, details
+     beneath — so the per-project placement that keeps the spun grid from
+     looking like a template is deliberately overridden here. */
+  const slot: ArtSlot = easy ? "top" : art?.slot ?? "top";
   const bare = art?.bare === true;
   const hasArt = Boolean(Art || project.cover);
 
@@ -270,26 +277,33 @@ function Card({
 export function WorkGallery({
   result,
   spinning,
-  gamesFirst = false,
+  focus = null,
+  easy = false,
 }: {
   result: SpinResult | null;
   spinning: boolean;
-  /** Float the playable builds to the top of the collection. Everything else
-   *  stays mounted below in its usual order — the gallery re-ranks rather
-   *  than filters, so arriving from the games badge must not look like the
-   *  archive lost thirty projects. */
-  gamesFirst?: boolean;
+  /** Plain two-up grid with no machine driving it: every card the same width,
+   *  artwork on top, details beneath. The composed row grammar and the
+   *  de-emphasis both assume a spin, so neither applies here. */
+  easy?: boolean;
+  /** Float one slice of the archive to the top. Everything else stays mounted
+   *  below in its usual order — the gallery re-ranks rather than filters, so
+   *  arriving from a home-page link must not look like the archive lost
+   *  thirty projects. */
+  focus?: Focus | null;
 }) {
   const combo = result?.combo ?? null;
   const ranked = useMemo(() => {
     const all = rankProjects(combo);
-    if (!gamesFirst) return all;
+    if (!focus) return all;
     // Sort is stable, so a spin's ranking still decides the order inside each
-    // group — playable work leads, the rest follows exactly as it would have.
+    // group — the focused slice leads, the rest follows exactly as it would.
     return [...all].sort(
-      (a, b) => Number(Boolean(b.project.play)) - Number(Boolean(a.project.play)),
+      (a, b) =>
+        Number(matchesFocus(b.project, focus)) -
+        Number(matchesFocus(a.project, focus)),
     );
-  }, [combo, gamesFirst]);
+  }, [combo, focus]);
   const order = useMemo(() => ranked.map((m) => m.project.id), [ranked]);
 
   // Re-composed on every spin, so widths move with the ranking.
@@ -310,15 +324,21 @@ export function WorkGallery({
 
   return (
     <section className={styles.collection} aria-label="Work">
-      <div className={styles.grid} data-spinning={spinning ? "true" : "false"}>
+      <div
+        className={`${styles.grid} ${easy ? styles.gridEasy : ""}`}
+        data-spinning={spinning ? "true" : "false"}
+      >
         {ranked.map((m, i) => (
           <Card
             key={m.project.id}
             match={m}
             active={!!result}
-            span={spans[i] ?? 3}
+            /* Easy mode is a uniform two-up, so the composed spans are
+               ignored rather than recomputed. */
+            span={easy ? 1 : spans[i] ?? 3}
             register={register(m.project.id)}
             onPlay={setGame}
+            easy={easy}
           />
         ))}
       </div>

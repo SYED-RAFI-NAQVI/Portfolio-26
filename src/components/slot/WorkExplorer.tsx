@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import styles from "./WorkExplorer.module.css";
 import { SlotMachine } from "./SlotMachine";
 import { WorkGallery } from "./WorkGallery";
-import type { SpinResult } from "../../data/slot";
+import { FOCUS_LABEL, isFocus, type SpinResult } from "../../data/slot";
 
 /**
  * Two-column Work page.
@@ -20,18 +20,18 @@ export function WorkExplorer() {
   const [spinning, setSpinning] = useState(false);
 
   /**
-   * `?games=1` floats the playable builds to the top of the collection — the
-   * home page's games badge is the only thing that sets it. Nothing is removed;
-   * the rest of the archive stays below. Held in state rather than read from
-   * the URL on every render so dismissing it does not depend on the navigation
-   * landing first.
+   * `?focus=` floats one slice of the archive to the top — the home page's
+   * four entry points are the only things that set it. Nothing is removed; the
+   * rest stays below. Held in state rather than read from the URL on every
+   * render so dismissing it does not depend on the navigation landing first.
    */
   const params = useSearchParams();
   const router = useRouter();
-  const [gamesFirst, setGamesFirst] = useState(params.get("games") === "1");
+  const initial = params.get("focus");
+  const [focus, setFocus] = useState(isFocus(initial) ? initial : null);
 
-  const clearGames = useCallback(() => {
-    setGamesFirst(false);
+  const clearFocus = useCallback(() => {
+    setFocus(null);
     router.replace("/work", { scroll: false });
   }, [router]);
 
@@ -45,6 +45,23 @@ export function WorkExplorer() {
    * together rather than being unwound piece by piece.
    */
   const [machineKey, setMachineKey] = useState(0);
+
+  /**
+   * Easy mode drops the machine and lays the archive out as a plain two-up
+   * grid. Switching clears the spin and remounts the machine: the machine
+   * keeps its landed faces in internal state and in DOM transforms written
+   * outside React, so leaving it mounted-but-hidden would hand its
+   * ResizeObserver a zero width and park the drums between faces. Coming back
+   * to a blank machine and an unranked gallery is at least consistent.
+   */
+  const [easy, setEasy] = useState(false);
+
+  const toggleMode = useCallback(() => {
+    setEasy((on) => !on);
+    setResult(null);
+    setSpinning(false);
+    setMachineKey((n) => n + 1);
+  }, []);
 
   const onSpinStart = useCallback(() => setSpinning(true), []);
 
@@ -63,10 +80,22 @@ export function WorkExplorer() {
     <div className={styles.split}>
       <aside className={styles.control}>
         <div className={styles.controlInner}>
-          <Link className={styles.back} href="/">
-            <span className={styles.backArrow} aria-hidden="true">←</span>
-            Back
-          </Link>
+          <div className={styles.topBar}>
+            <Link className={styles.back} href="/">
+              <span className={styles.backArrow} aria-hidden="true">←</span>
+              Back
+            </Link>
+
+            <button
+              type="button"
+              className={styles.modeToggle}
+              onClick={toggleMode}
+              data-easy={easy ? "true" : "false"}
+              aria-pressed={easy}
+            >
+              {easy ? "Slot mode" : "Easy mode"}
+            </button>
+          </div>
 
           <h1 className={styles.title}>
             Everything I&apos;ve shipped since 2017.{" "}
@@ -75,31 +104,38 @@ export function WorkExplorer() {
             </span>
           </h1>
 
-          <SlotMachine
-            key={machineKey}
-            onResolve={onResolve}
-            onSpinStart={onSpinStart}
-            onReset={onReset}
-            canReset={result !== null}
-          />
+          {!easy && (
+            <SlotMachine
+              key={machineKey}
+              onResolve={onResolve}
+              onSpinStart={onSpinStart}
+              onReset={onReset}
+              canReset={result !== null}
+            />
+          )}
 
-          {gamesFirst && (
+          {focus && (
             <button
               type="button"
               className={styles.gamesChip}
-              onClick={clearGames}
+              onClick={clearFocus}
             >
               <span className={styles.gamesDot} aria-hidden="true" />
-              PLAYABLE FIRST
+              {FOCUS_LABEL[focus]}
               <span className={styles.gamesClear} aria-hidden="true">×</span>
             </button>
           )}
 
-          <p className={styles.foot}>DRAG THE KNOB DOWN</p>
+          {!easy && <p className={styles.foot}>DRAG THE KNOB DOWN</p>}
         </div>
       </aside>
 
-      <WorkGallery result={result} spinning={spinning} gamesFirst={gamesFirst} />
+      <WorkGallery
+        result={result}
+        spinning={spinning}
+        focus={focus}
+        easy={easy}
+      />
     </div>
   );
 }

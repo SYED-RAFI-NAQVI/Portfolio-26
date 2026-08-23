@@ -106,6 +106,71 @@ export const DOMAIN_ART: Record<string, string> = {
   "Consumer / Web": "/domain/consumer_web.webp",
 };
 
+/**
+ * Display order for the skills page, highest level of work first: what I own,
+ * then how systems are shaped, then what they are built out of.
+ *
+ * Separate from `SKILL_REEL`, which is the machine's strip and whose order is
+ * the reel's business. Anything missing here still renders — it falls to the
+ * end in reel order rather than vanishing.
+ */
+export const SKILL_LEVEL_ORDER: readonly string[] = [
+  // Ownership
+  "Founder",
+  "Leadership",
+  "0→1",
+  "MVP",
+  "First Users",
+  "Paying Customers",
+  "GTM",
+  "Sales",
+  "Scaling",
+
+  // Shape of the system
+  "System Design",
+  "Full-Stack Engineering",
+  "Backend Engineering",
+  "Frontend Engineering",
+
+  // AI systems
+  "AI Agents",
+  "RAG",
+  "LLM Evals",
+  "Context & Memory",
+  "Human-in-the-Loop",
+  "AI Observability",
+  "Machine Learning",
+  "Computer Vision",
+
+  // Core languages and frameworks
+  "TypeScript",
+  "JavaScript",
+  "Python",
+  "React",
+  "Next.js",
+  "Node.js",
+
+  // Specialisms
+  "Databases",
+  "Vector Databases",
+  "Queues & Background Jobs",
+  "Streaming",
+  "CLI & Developer Tooling",
+  "WebGL / Creative Coding",
+  "Smart Contracts",
+  "Programmatic SEO",
+];
+
+/** `SKILL_REEL` in level order, with anything unlisted appended in reel order. */
+export function skillsByLevel(): string[] {
+  const rank = new Map(SKILL_LEVEL_ORDER.map((s, i) => [s, i]));
+  return [...SKILL_REEL].sort(
+    (a, b) =>
+      (rank.get(a) ?? Number.MAX_SAFE_INTEGER) -
+      (rank.get(b) ?? Number.MAX_SAFE_INTEGER),
+  );
+}
+
 export const SKILL_ART: Record<string, string> = {
   // Engineering
   JavaScript: "/skills/js.webp",
@@ -756,6 +821,52 @@ export const projects: Project[] = [
     skills: ["JavaScript", "Frontend Engineering", "0→1"],
   }
 ];
+
+/* ─── Focus ──────────────────────────────────────────────────────────────── */
+
+/**
+ * An arrival that already knows what it came for.
+ *
+ * The home page's four entry points each name a slice of the archive. They
+ * *rank* rather than filter — landing from "AI products" must not look like
+ * the other thirty projects stopped existing — so every focus is a sort key,
+ * never a subset.
+ */
+export type Focus = "games" | "startups" | "software" | "hackathons";
+
+export const FOCUS_LABEL: Record<Focus, string> = {
+  games: "Playable first",
+  startups: "Startups first",
+  software: "Company work first",
+  hackathons: "Hackathons first",
+};
+
+export function isFocus(value: string | null): value is Focus {
+  return value === "games" || value === "startups" || value === "software" ||
+    value === "hackathons";
+}
+
+/**
+ * Whether a project belongs to the slice a focus names.
+ *
+ * Every case reads `type`, which is why the four slices are disjoint: the
+ * archive already sorts itself into founded / employed / hackathon, and a
+ * project is only ever one of those. Earlier versions matched on skills and
+ * produced slices that overlapped by three-quarters — two links opening the
+ * same cards.
+ */
+export function matchesFocus(project: Project, focus: Focus): boolean {
+  switch (focus) {
+    case "games":
+      return Boolean(project.play);
+    case "startups":
+      return project.type.includes("Founder");
+    case "software":
+      return project.type.includes("Job");
+    case "hackathons":
+      return project.type.includes("Hackathon");
+  }
+}
 
 /* ─── Matching ───────────────────────────────────────────────────────────── */
 

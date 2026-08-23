@@ -76,6 +76,27 @@
     0 0 44px rgba(227, 192, 122, 0.12);
 }
 
+/* ─── Easy mode ───
+   No machine, no spin: a plain two-up grid. Every card is the same width and
+   breaks at the same line, which is exactly what the composed row grammar
+   exists to avoid — but that grammar is a response to a spin, and without one
+   the regular shape is the point. */
+.gridEasy {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+/* Nothing is ranked in easy mode, so nothing is de-emphasised. */
+.gridEasy .card[data-dim="true"] {
+  opacity: 1;
+  filter: none;
+}
+
+@media (max-width: 900px) {
+  .gridEasy {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 /* De-emphasised, never removed — the collection stays legible as a whole. */
 .card[data-dim="true"] {
   opacity: 0.34;

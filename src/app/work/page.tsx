@@ -16,7 +16,7 @@ export default function SlotPage() {
     <main className={styles.page}>
       <InteractionSounds />
 
-      {/* WorkExplorer reads `?games=1` via useSearchParams, which bails out of
+      {/* WorkExplorer reads `?focus=` via useSearchParams, which bails out of
           prerendering up to the nearest boundary. Suspense keeps the rest of
           the page in the static HTML. */}
       <Suspense>

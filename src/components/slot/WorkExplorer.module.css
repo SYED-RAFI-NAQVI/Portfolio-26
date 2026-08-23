@@ -36,12 +36,20 @@
 
 /* ─── Back ───────────────────────────────────────────────────────────────── */
 
+/* Back and the mode switch share a row: the switch has to outlive the
+   machine it hides, so it cannot live on the machine's own rail. */
+.topBar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
 .back {
   display: inline-flex;
   align-items: center;
   gap: 8px;
   height: 34px;
-  margin-bottom: 22px;
   padding: 0 14px;
   border: 1px solid var(--hairline);
   background: var(--canvas-elevated);
@@ -150,4 +158,43 @@
 }
 .gamesChip:hover .gamesClear {
   color: var(--gold-lit, #f6e3ac);
+}
+
+/* ─── Mode switch ──────────────────────────────────────────────
+   Same chassis as Back so the row reads as one control group.
+   Active state is amber rather than gold — gold already means
+   "this runs" on the playable cards and must not be diluted.
+   ------------------------------------------------------------- */
+
+.modeToggle {
+  display: inline-flex;
+  align-items: center;
+  height: 34px;
+  padding: 0 14px;
+  border: 1px solid var(--hairline);
+  background: var(--canvas-elevated);
+  color: var(--mute);
+  cursor: pointer;
+
+  font-family: var(--font-geist-mono), monospace;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+
+  transition: color 160ms ease, border-color 160ms ease, background 160ms ease;
+}
+.modeToggle:hover {
+  color: var(--ink);
+  border-color: #3a3a3a;
+}
+.modeToggle:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.modeToggle[data-easy="true"] {
+  color: var(--ink);
+  border-color: #3a3a3a;
+  background: #17191b;
 }
