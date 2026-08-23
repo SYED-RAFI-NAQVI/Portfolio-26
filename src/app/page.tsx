@@ -7,6 +7,7 @@ import { DotMatrixCloud } from "../components/home/DotMatrixCloud";
 import { TimeBasedCelestial } from "../components/home/TimeBasedCelestial";
 import { InteractionSounds } from "../components/InteractionSounds";
 import { GamesBadge } from "../components/home/GamesBadge";
+import { SiteNav } from "../components/SiteNav";
 import { AboutDrawer } from "../components/about/AboutDrawer";
 
 export const metadata: Metadata = {
@@ -19,38 +20,7 @@ export default function Home() {
     <div className={styles.page}>
       <InteractionSounds />
       <GamesBadge />
-      <header className={styles.header}>
-        <div className={styles.avatarWrap}>
-          <a href="#about">
-            <Image 
-              src="/logo1.png" 
-              alt="Logo" 
-              width={36} 
-              height={36} 
-              className={styles.avatar} 
-            />
-          </a>
-        </div>
-        <nav className={styles.nav} aria-label="Primary">
-          <Link href="/" className={styles.active}>
-            <span className={styles.navIcon} style={{ maskImage: "url('/nav-home.svg')", WebkitMaskImage: "url('/nav-home.svg')" }} />
-            Home
-          </Link>
-          <Link href="/work">
-            <span className={styles.navIcon} style={{ maskImage: "url('/nav-work.svg')", WebkitMaskImage: "url('/nav-work.svg')" }} />
-            Work
-          </Link>
-          <a href="#about">
-            <span className={styles.navIcon} style={{ maskImage: "url('/nav-about.svg')", WebkitMaskImage: "url('/nav-about.svg')" }} />
-            About
-          </a>
-        </nav>
-
-        <Link className={styles.resume} href="/resume.pdf" target="_blank" rel="noopener noreferrer">
-          <span className={styles.navIcon} style={{ maskImage: "url('/nav-resume.svg')", WebkitMaskImage: "url('/nav-resume.svg')" }} />
-          Resume
-        </Link>
-      </header>
+      <SiteNav active="home" />
 
       <section className={styles.hero}>
         <div className={styles.cloudTopRight}>
@@ -60,25 +30,46 @@ export default function Home() {
           <TimeBasedCelestial />
         </div>
         <h1 className={styles.bio}>
-          <a href="#about" className={styles.titleInline} data-hover-sound="ambient" style={{ textDecoration: 'none' }}>
-            <span className={styles.label}>Rafi</span>
-            <span className={styles.waveInline} aria-label="smiling">
-              😊😊
+          <span className={styles.line}>
+            <a href="#about" className={styles.titleInline} data-hover-sound="ambient" style={{ textDecoration: 'none' }}>
+              <span className={styles.label}>Rafi</span>
+              <span className={styles.waveInline} aria-label="smiling">
+                😊
+              </span>
+            </a>{" "}
+            <span className={styles.soft}>builds</span>{" "}
+            <Link className={styles.bioLink} href="/work?focus=startups" data-sfx="ai" data-hover-sound="ambient">
+              <span className={styles.label}>AI startups</span>
+            </Link>
+            <span className={styles.logoRow} aria-hidden="true">
+              <Image src="/alif-logo.svg" alt="" width={48} height={48} className={`${styles.heroLogo} ${styles.heroLogoDark}`} />
+              <Image src="/beonai-logo.svg" alt="" width={48} height={48} className={`${styles.heroLogo} ${styles.heroLogoDark}`} />
+              <Image src="/paperpilot-logo.png" alt="" width={48} height={48} className={`${styles.heroLogo} ${styles.heroLogoDark}`} />
+              <Image src="/basketo-logo.png" alt="" width={48} height={48} className={`${styles.heroLogo} ${styles.heroLogoDark}`} />
             </span>
-          </a>{" "}
-          <span className={styles.soft}>builds</span>{" "}
-          <Link className={styles.bioLink} href="/work?filter=ai" data-sfx="ai" data-hover-sound="ambient">
-            <span className={styles.label}>AI products</span>
-          </Link>
-          ,{" "}
-          <Link className={styles.bioLink} href="/work?filter=software" data-sfx="software" data-hover-sound="ambient">
-            <span className={styles.label}>software</span>
-          </Link>
-          , <span className={styles.soft}>and occasionally</span>{" "}
-          <Link className={styles.bioLink} href="/work?filter=companies" data-sfx="companies" data-hover-sound="ambient">
-            <span className={styles.label}>companies</span>
-          </Link>
-          . <span className={styles.soft}>6+ years making ideas real.</span>
+            ,
+          </span>
+
+          <span className={styles.line}>
+            <span className={styles.soft}>ships</span>{" "}
+            <Link className={styles.bioLink} href="/work?focus=software" data-sfx="software" data-hover-sound="ambient">
+              <span className={styles.label}>software</span>
+            </Link>
+            <span className={styles.logoRow} aria-hidden="true">
+              <Image src="/gutenberg-logo.png" alt="" width={48} height={48} className={`${styles.heroLogo} ${styles.heroLogoDark}`} />
+              <Image src="/tecnotree-logo.jpeg" alt="" width={48} height={48} className={styles.heroLogo} />
+              <Image src="/prodjar-logo.jpeg" alt="" width={48} height={48} className={styles.heroLogo} />
+            </span>{" "}
+            <span className={styles.soft}>for enterprises,</span>
+          </span>
+
+          <span className={styles.line}>
+            <span className={styles.soft}>and wins</span>{" "}
+            <Link className={styles.bioLink} href="/work?focus=hackathons" data-sfx="companies" data-hover-sound="ambient">
+              <span className={styles.label}>hackathons</span>
+            </Link>
+            <span className={styles.soft}>, since 6+ years.</span>
+          </span>
           <span className={styles.ctaBreak}>
             <Link
               className={`${styles.bioLink} ${styles.cta}`}

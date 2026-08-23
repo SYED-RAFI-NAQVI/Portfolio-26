@@ -62,7 +62,7 @@ export function GamesBadge() {
 
   return (
     <Link
-      href="/work?games=1"
+      href="/work?focus=games"
       className={styles.badge}
       // Held back until measured, so it never paints on top of the sound
       // control for a frame and then jumps sideways.

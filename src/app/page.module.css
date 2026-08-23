@@ -11,8 +11,7 @@
 .plantContainer {
   position: absolute;
   bottom: 0;
-  right: 32px;
-  width: min(320px, 35vw);
+  right: 80px;
   z-index: -1;
   pointer-events: auto;
 }
@@ -23,7 +22,7 @@
   height: 94px;
   scale: 1.3;
   transform-origin: top right;
-  top: 24vh;
+  top: 14vh;
   right: 6vw;
   opacity: 0.52;
   animation: driftCloud 24s ease-in-out infinite alternate;
@@ -32,7 +31,7 @@
 
 .celestialTopLeft {
   position: absolute;
-  top: 12vh;
+  top: calc(4vh + 25px);
   left: 6vw;
   opacity: 0.65;
   z-index: -2;
@@ -44,133 +43,39 @@
 }
 
 /* ─── Header & Nav ──────────────────────────────────── */
-.header {
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  padding-bottom: 64px;
-}
 
-.avatarWrap {
-  display: flex;
-  align-items: center;
-}
 
-.avatar {
-  border-radius: 0;
-  object-fit: contain;
-  filter: brightness(1.1) contrast(1.05);
-  margin-left: -8px;
-}
 
-.nav {
-  height: 48px;
-  display: flex;
-  align-items: stretch;
-  border: 1px solid var(--hairline);
-  background: var(--canvas-elevated);
-}
 
-.nav a {
-  position: relative;
-  display: flex;
-  align-items: center;
-  padding: 0 24px;
-  border-right: 1px solid var(--hairline-soft);
-  color: #a0a0a0;
-  text-decoration: none;
-  font-family: var(--font-geist-mono), monospace;
-  font-size: 11px;
-  font-weight: 600;
-  line-height: 1;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  transition: color 150ms ease, background 150ms ease;
-}
 
-.nav a:last-child {
-  border-right: 0;
-}
 
-.nav a:hover {
-  color: var(--text-primary);
-  background: rgba(255, 255, 255, 0.03);
-}
 
-.nav a.active {
-  color: var(--text-primary);
-  background: var(--canvas-subtle);
-}
 
-.nav a.active::after {
-  content: "";
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 16px;
-  height: 2px;
-  background: var(--text-primary);
-}
 
-.nav a:focus-visible, .resume:focus-visible {
-  outline: 2px solid var(--text-primary);
-  outline-offset: -2px;
-}
 
-.navIcon {
-  display: inline-block;
-  width: 16px;
-  height: 16px;
-  margin-right: 8px;
-  background-color: currentColor;
-  mask-size: contain;
-  mask-repeat: no-repeat;
-  mask-position: center;
-  -webkit-mask-size: contain;
-  -webkit-mask-repeat: no-repeat;
-  -webkit-mask-position: center;
-}
 
-.resume {
-  justify-self: end;
-  display: flex;
-  align-items: center;
-  height: 48px;
-  padding: 0 24px;
-  border: 1px solid var(--hairline);
-  background: var(--canvas-elevated);
-  color: #a0a0a0;
-  font: 600 11px/1 var(--font-geist-mono), monospace;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
-  text-decoration: none;
-  transition: color 150ms ease, border-color 150ms ease, background 150ms ease;
-}
 
-.resume:hover {
-  color: var(--text-primary);
-  border-color: var(--border-subtle);
-  background: rgba(255, 255, 255, 0.03);
-}
 
 /* ─── Hero ──────────────────────────────────────────── */
 .hero {
   flex: 1;
   display: flex;
-  align-items: center;
-  padding: 52px 0 46px;
+  /* Was centred in the leftover height, which parked the headline most of a
+     screen below the nav on a tall window. Top-aligned, so it sits where the
+     eye already is after the nav. */
+  align-items: flex-start;
+  padding: clamp(64px, 14vh, 190px) 0 46px;
 }
 
 .bio {
   margin: 0;
   width: 100%;
   max-width: 1480px;
-  font-size: clamp(48px, 6vw, 96px);
+  font-size: clamp(46px, 6.2vw, 86px);
   line-height: 0.985;
   font-weight: 400;
   letter-spacing: -0.055em;
-  text-wrap: balance;
+  text-wrap: pretty;
   color: var(--mute);
 }
 
@@ -249,10 +154,69 @@
   100% { opacity: 1; }
 }
 
+/* Its own line, but the same size as the claim — the separation is the line
+   break and the colour, not a change of scale. */
+/* Each clause holds its own line, so the sentence breaks where it means to
+   rather than wherever the measure runs out. */
+.line {
+  display: block;
+}
+
+/* The emoji is inline-block, so it is its own break opportunity and would drop
+   to a line by itself the moment the name reached the measure. */
+.titleInline {
+  white-space: nowrap;
+}
+
+/* ─── Inline logo stacks ───
+   The companies behind a noun, shown rather than named. Sized in em so they
+   track the headline at every viewport, and overlapped so a set of four reads
+   as one object beside the word instead of four separate marks. */
+.logoRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.09em;
+  margin-left: 0.24em;
+  vertical-align: 0.02em;
+}
+
+/* Alternating tilt, so the row reads as tiles dropped in a line rather than a
+   ruler-straight strip. nth-child rather than a per-logo class: the angle is a
+   property of position in the row, not of which company it is. */
+.heroLogo:nth-child(odd) {
+  transform: rotate(6deg);
+}
+.heroLogo:nth-child(even) {
+  transform: rotate(-6deg);
+}
+
+.heroLogo {
+  width: 0.56em;
+  height: 0.56em;
+  /* App-icon squircle rather than a circle, and set side by side rather than
+     overlapped — each mark reads as its own tile. */
+  border-radius: 0.11em;
+  /* The marks range from white-on-transparent SVGs to logos on white JPEGs,
+     so each sits on its own light disc — without it half of them vanish into
+     the page and the other half carry a white square. */
+  background: #ededed;
+  border: 1px solid #000;
+  object-fit: contain;
+}
+/* Marks drawn light-on-dark: on the shared light ground they disappear, so
+   these three carry the page's own black instead. */
+.heroLogoDark {
+  background: #0a0a0a;
+  border-color: #2a2a2a;
+}
+
 .ctaBreak {
   display: block;
-  margin-top: 0.08em;
+  margin-top: 0.28em;
+  font-size: 0.82em;
 }
+
+
 
 .bioLink.cta .label {
   font-family: var(--font-dot-gothic), sans-serif;

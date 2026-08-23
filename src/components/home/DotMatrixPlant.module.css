@@ -1,5 +1,5 @@
 .plantWrap {
-  width: min(380px, 78vw);
+  width: min(200px, 22vw);
   aspect-ratio: 31/39;
   display: grid;
   place-items: center;
@@ -17,8 +17,8 @@
 }
 
 .dot {
-  width: 4px;
-  height: 4px;
+  width: 3px;
+  height: 3px;
   align-self: center;
   justify-self: center;
   border-radius: 50%;
