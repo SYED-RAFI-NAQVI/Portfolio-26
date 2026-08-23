@@ -532,42 +532,6 @@
 }
 
 /* ─── Links ─── */
-.linksList {
-  display: flex;
-  flex-direction: column;
-}
-
-.linkRow {
-  display: flex;
-  align-items: center;
-  padding: 16px 0;
-  border-bottom: 1px solid var(--hairline, #222);
-  color: var(--text-primary, #fff);
-  text-decoration: none;
-  font-weight: 500;
-  transition: opacity 150ms ease;
-}
-.linkRow:first-child {
-  border-top: 1px solid var(--hairline, #222);
-}
-.linkRow:hover {
-  opacity: 0.7;
-}
-
-.linkSubtext {
-  margin-left: 16px;
-  font-size: 13px;
-  color: var(--text-muted, #888);
-  font-weight: 400;
-}
-
-.linkArrow {
-  margin-left: auto;
-  font-family: var(--font-geist-mono), monospace;
-  font-size: 12px;
-  color: var(--text-muted, #888);
-}
-
 /* ─── Resume Button ─── */
 .resumeWrapper {
   margin-top: 60px;
@@ -615,10 +579,6 @@
   .scrollContent {
     padding: 24px 20px 80px;
   }
-  .linkSubtext {
-    display: none;
-  }
-
   /* Responsive PATH grids */
   .pathRow {
     grid-template-columns: 48px minmax(0, 1fr);

@@ -6,6 +6,7 @@ import styles from "./AboutDrawer.module.css";
 import { sound } from "../../sounds";
 import { BrandIcon } from "./BrandIcon";
 import { LocationMap } from "./LocationMap";
+import { FlowingMenu } from "./FlowingMenu";
 import { 
   intro, 
   currently, 
@@ -311,15 +312,7 @@ export function AboutDrawer() {
 
           {/* ELSEWHERE */}
           <Section label="Elsewhere" id="elsewhere">
-             <div className={styles.linksList}>
-              {links.map((link, i) => (
-                <a key={i} href={link.href} target="_blank" rel="noopener noreferrer" className={styles.linkRow}>
-                  <span>{link.label}</span>
-                  {link.text && <span className={styles.linkSubtext}>{link.text}</span>}
-                  <span className={styles.linkArrow}>↗</span>
-                </a>
-              ))}
-            </div>
+            <FlowingMenu items={links} />
           </Section>
 
           {/* VIEW RESUME */}
