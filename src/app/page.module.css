@@ -231,8 +231,23 @@
 /* ─── Responsive & Accessibility ────────────────────── */
 @media(max-width: 900px) {
   .page { padding: 20px; }
-  .hero { align-items: flex-start; padding-top: 74px; }
-  .bio { font-size: clamp(40px, 7vw, 72px); }
+
+  /* Centred in the space the hero owns, on both axes. The base rule
+     top-aligns behind a clamp(64px, 14vh, 190px) inset, so align-items and
+     the padding both have to go — dropping the padding alone leaves
+     flex-start still holding the headline up. */
+  .hero {
+    align-items: center;
+    padding: 24px 0;
+  }
+
+  /* Same 6.2vw curve as the desktop rule, clamped lower — so 900 gives
+     55.8px and desktop's floor at 901 gives 55.9px, and the breakpoint is
+     invisible. The floor is 42px to meet the phone rule's cap at 640.
+
+     The headline stays left-set, as it is on desktop — only its block is
+     centred in the hero. */
+  .bio { font-size: clamp(42px, 6.2vw, 56px); }
   .plantContainer {
     width: min(220px, 30vw);
     bottom: 0;
@@ -241,7 +256,26 @@
 }
 
 @media(max-width: 640px) {
-  .bio { font-size: clamp(32px, 10vw, 52px); }
+  /* ─── Sky ───
+     The cloud goes. At desktop geometry it is 273px wide on a 390px screen
+     and overlapped the sun by 90x100; the only size that clears a full-size
+     sun on a 320px screen is about 105px, which is small enough to read as
+     debris rather than sky. The sun alone is the better composition, and
+     subtraction is the house rule.
+
+     The sun is untouched — it keeps its 160px and its base offsets. */
+  .cloudTopRight {
+    display: none;
+  }
+
+  /* 42px at 390 — 10.77vw is the ratio that lands there. Capped at 42 so it
+     holds from 390 to the breakpoint, where the tablet rule picks 42 up as
+     its floor; without that the type would SHRINK as the screen grew.
+
+     The clauses wrap at this size — the longest runs ~16em, so 42px wants
+     ~672px against a 350px measure. Deliberate: presence over line breaks. */
+  .bio { font-size: clamp(32px, 10.77vw, 42px); }
+
   .plantContainer {
     position: relative;
     bottom: auto;

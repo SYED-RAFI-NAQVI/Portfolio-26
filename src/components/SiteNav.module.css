@@ -100,22 +100,39 @@
   background: rgba(255, 255, 255, 0.03);
 }
 
-/* The three-column grid has nowhere to go on a narrow screen: the nav's five
-   uppercase labels alone outrun it. Stack, and let the nav scroll rather than
-   wrap into two ragged rows. Carried over from the skills page, which handled
-   this before the header became shared. */
-@media (max-width: 620px) {
+/* ─── Tablet · 641–900 ─────────────────────────────────────────
+   The header is `1fr auto 1fr`, so its width is twice the widest
+   OUTER cell plus the nav — not the nav alone. Trimming horizontal
+   padding is therefore enough to keep all four labels on one row;
+   nothing has to be dropped until the phone breakpoint.
+   ------------------------------------------------------------- */
+@media (max-width: 900px) {
+  .header { padding-bottom: 44px; }
+  .nav a,
+  .resume { padding: 0 16px; }
+}
+
+/* ─── Phone · <=640 ────────────────────────────────────────────
+   The bar steps aside entirely and `NavOverlay` takes over: a MENU
+   trigger in the header, and a full-screen sheet behind it.
+
+   Both render on every page — only their visibility is a media
+   query — so the server and client trees are identical and nothing
+   is swapped at runtime.
+
+   Columns drop to `auto 1fr`. Under `1fr auto 1fr` the two outer
+   cells are forced equal, so the header reserved the Resume
+   button's width on the logo side as well and overflowed on space
+   it never used.
+   ------------------------------------------------------------- */
+@media (max-width: 640px) {
   .header {
-    grid-template-columns: minmax(0, 1fr);
-    justify-items: start;
-    gap: 20px;
-    padding-bottom: 40px;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 12px;
+    padding-bottom: 28px;
   }
-  .nav {
-    max-width: 100%;
-    overflow-x: auto;
-  }
-  .resume {
-    justify-self: start;
-  }
+
+  .nav,
+  .resume { display: none; }
 }

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import styles from "./SiteNav.module.css";
+import { NavOverlay } from "./NavOverlay";
 
 /**
  * Primary site header — logo, nav, resume.
@@ -59,6 +60,11 @@ export function SiteNav({ active }: { active?: "home" | "work" }) {
         <span className={styles.navIcon} style={{ maskImage: "url('/nav-resume.svg')", WebkitMaskImage: "url('/nav-resume.svg')" }} />
         Resume
       </Link>
+
+      {/* Phones get the overlay instead of the bar. Rendered here rather than
+          swapped in by JS so the markup is identical on server and client;
+          which of the two is visible is purely a CSS breakpoint. */}
+      <NavOverlay active={active} />
     </header>
   );
 }
