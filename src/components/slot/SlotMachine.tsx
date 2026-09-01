@@ -102,6 +102,19 @@ export function SlotMachine({
     reduced.current = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
   }, []);
 
+  /* Below 900 the lever rail is a horizontal thumb track, not a vertical
+     throw, so the drag has to read the other axis. A ref rather than state:
+     only the pointer handlers consult it, and re-rendering mid-drag would
+     fight the animation loop. */
+  const compact = useRef(false);
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 900px)");
+    const sync = () => { compact.current = mq.matches; };
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
+
   const paint = (i: number, r: Reel) => {
     const strip = stripRefs.current[i];
     const win = windowRefs.current[i];
@@ -311,7 +324,9 @@ export function SlotMachine({
   }, [phase, tickLoop]);
 
   /* ─── Lever drag ───────────────────────────────────────────────────────── */
-  const drag = useRef({ active: false, startY: 0, pull: 0, moved: 0, lastSfx: 0 });
+  const drag = useRef({
+    active: false, startX: 0, startY: 0, pull: 0, moved: 0, lastSfx: 0,
+  });
 
   const setPull = (v: number) => {
     drag.current.pull = v;
@@ -325,6 +340,7 @@ export function SlotMachine({
       unlocked.current = true;
     }
     drag.current.active = true;
+    drag.current.startX = e.clientX;
     drag.current.startY = e.clientY;
     drag.current.moved = 0;
     try {
@@ -337,9 +353,14 @@ export function SlotMachine({
 
   const onPointerMove = (e: React.PointerEvent<HTMLButtonElement>) => {
     if (!drag.current.active) return;
-    const dy = e.clientY - drag.current.startY;
-    drag.current.moved = Math.max(drag.current.moved, Math.abs(dy));
-    const pull = Math.max(0, Math.min(1, dy / 130));
+    /* Rightwards along the thumb track, downwards along the vertical throw.
+       The shorter track gets a shorter commit distance to match. */
+    const horizontal = compact.current;
+    const delta = horizontal
+      ? e.clientX - drag.current.startX
+      : e.clientY - drag.current.startY;
+    drag.current.moved = Math.max(drag.current.moved, Math.abs(delta));
+    const pull = Math.max(0, Math.min(1, delta / (horizontal ? 96 : 130)));
     setPull(pull);
     const now = performance.now();
     if (now - drag.current.lastSfx > 55 && pull > 0.04) {

@@ -46,6 +46,11 @@ export function WorkExplorer() {
    */
   const [machineKey, setMachineKey] = useState(0);
 
+  /* Small screens only — the dock slides off to the right and leaves its tab
+     at the edge. Above the breakpoint the machine is in the flow and the tab
+     is not rendered visible, so this stays false and costs nothing. */
+  const [machineHidden, setMachineHidden] = useState(false);
+
   /**
    * Easy mode drops the machine and lays the archive out as a plain two-up
    * grid. Switching clears the spin and remounts the machine: the machine
@@ -104,14 +109,45 @@ export function WorkExplorer() {
             </span>
           </h1>
 
+          {/* Wrapped so the machine can leave the flow on small screens and
+              dock to the bottom edge, letting the collection own the scroll.
+              On desktop this div is inert — the aside still lays out as it
+              always did. */}
           {!easy && (
-            <SlotMachine
-              key={machineKey}
-              onResolve={onResolve}
-              onSpinStart={onSpinStart}
-              onReset={onReset}
-              canReset={result !== null}
-            />
+            <div
+              className={styles.machineDock}
+              data-hidden={machineHidden ? "true" : "false"}
+            >
+              <button
+                type="button"
+                className={styles.dockToggle}
+                onClick={() => setMachineHidden((h) => !h)}
+                aria-expanded={!machineHidden}
+                aria-label={
+                  machineHidden ? "Show the machine" : "Hide the machine"
+                }
+              >
+                <svg
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  aria-hidden="true"
+                >
+                  <path d={machineHidden ? "M15 5L8 12l7 7" : "M9 5l7 7-7 7"} />
+                </svg>
+              </button>
+
+              <SlotMachine
+                key={machineKey}
+                onResolve={onResolve}
+                onSpinStart={onSpinStart}
+                onReset={onReset}
+                canReset={result !== null}
+              />
+            </div>
           )}
 
           {focus && (

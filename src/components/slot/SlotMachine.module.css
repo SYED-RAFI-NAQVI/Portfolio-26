@@ -450,31 +450,145 @@
 
 /* ─── Responsive ─────────────────────────────────────────────────────────── */
 
-@media (max-width: 860px) {
-  .wrap { --travel: 52px; }
+/* ═══ Docked machine ═════════════════════════════════════════════════════════
+   Below 900 the machine sits on the bottom edge of the page, so it has to be
+   short. The reels come down to a single compact band, and the lever rail —
+   which is 42px of vertical hardware when it has a wall to bolt to — becomes
+   the cabinet's own base plate: joined to it, no gap, no second border, so
+   the two read as one object rather than a machine and a slab beneath it.
+   ────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .rig {
+    grid-template-columns: minmax(0, 1fr);
+    /* Zero, so the plate meets the cabinet instead of floating under it. */
+    gap: 0;
+  }
 
-  .rig { grid-template-columns: minmax(0, 1fr); gap: 10px; }
+  .cabinet {
+    padding: 7px;
+    border-radius: 14px 14px 0 0;
+  }
+  .screen { padding: 5px; }
+  .bezel { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 5px; }
 
+  /* NOTE: do not set a height on .window here. Cells are square — a
+     ResizeObserver measures the column and feeds `itemH`, which is applied
+     inline to every .face. Forcing the window shorter leaves the faces at
+     their measured height and crops each artwork to a sliver. The machine is
+     sized by its WIDTH; the height follows on its own. */
+
+  /* ─── Base plate ─── */
   .leverColumn {
     flex-direction: row;
     align-items: center;
-    justify-content: center;
-    gap: 22px;
-    padding: 18px 24px;
-    border-radius: 12px;
+    justify-content: flex-start;
+    gap: 10px;
+    padding: 9px 9px 10px;
+    border-top: 0;
+    border-radius: 0 0 12px 12px;
+    background: linear-gradient(180deg, #171a1d 0%, #101315 55%, #1c2023 100%);
   }
-  .leverRig { width: 44px; height: 112px; }
-  .leverMount { width: 38px; height: 22px; }
-  .leverSlot { bottom: 16px; height: 82px; }
-  .leverKnob { width: 28px; height: 28px; }
 
-  .bezel { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; }
-  .cabinet { border-radius: 18px 18px 10px 10px; }
+  .reset {
+    width: 38px;
+    height: 38px;
+    margin-bottom: 0;
+  }
+
+  /* The rig stops being a 32x150 vertical throw and becomes the bar itself. */
+  .leverRig {
+    flex: 1;
+    width: auto;
+    height: 42px;
+    /* The whole rail is the button, so the grab target is the full track
+       rather than the 36px knob — you can start the slide anywhere on it. */
+    touch-action: none;
+  }
+  .leverGrabbed .leverKnob { cursor: grabbing; }
+
+  /* The housing and the slot describe a vertical shaft. There isn't one. */
+  .leverMount,
+  .leverSlot { display: none; }
+
+  /* The rail: a recessed track the knob runs along, same well as the reels
+     sit in so it reads as machined into the plate. */
+  .lever {
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    display: block;
+    border: 0;
+    border-radius: 21px;
+    touch-action: none;
+    background: var(--well);
+    box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.95);
+    /* The knob is the only thing that should ever leave the track. */
+    overflow: hidden;
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 9.5px;
+    font-weight: 600;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: #6f767c;
+  }
+
+  /* The accessible name comes from the button's aria-label, so this is the
+     visible label rather than the only one. It sits to the right of the
+     knob's rest position and is overrun as the knob travels. */
+  .lever::after {
+    content: "Slide to spin";
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+  }
+  .lever:disabled::after { content: "Spinning"; }
+
+  /* Travelled distance, lit faintly behind the knob. */
+  .lever::before {
+    content: "";
+    position: absolute;
+    left: 3px;
+    top: 3px;
+    bottom: 3px;
+    width: calc(36px + var(--pull) * (100% - 42px));
+    border-radius: 18px;
+    background: var(--amber-dim);
+    transition: width 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Percentages in `left` resolve against the containing block's width, so
+     the knob travels the true width of the rail without anyone having to
+     know what that width is — which matters, because the rail is sized by
+     the dock and the dock is sized by the viewport. */
+  .leverKnob {
+    position: absolute;
+    top: 3px;
+    left: calc(3px + var(--pull) * (100% - 42px));
+    transform: none;
+    width: 36px;
+    height: 36px;
+    /* Eased on release and on a keyboard spin. Killed mid-drag below, so the
+       knob still sits exactly under the finger while it is being moved —
+       a transition there would make it lag the touch. */
+    transition: left 320ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* .leverGrabbed is put on the rig at pointerdown and taken off at release,
+     so this is on for exactly the duration of the drag. */
+  .leverGrabbed .leverKnob,
+  .leverGrabbed .lever::before {
+    transition: none;
+  }
+
+  /* Redundant beside a bar that says PULL on it. */
+  .leverHint { display: none; }
 }
 
-@media (max-width: 520px) {
-  .cabinet { padding: 8px; }
-  .screen { padding: 6px; }
+@media (max-width: 640px) {
+  .leverColumn { gap: 8px; padding: 8px; }
+  .lever { font-size: 8.5px; letter-spacing: 0.12em; }
+  .lever::after { right: 12px; }
 }
 
 /* ─── Reduced motion ─────────────────────────────────────────────────────── */

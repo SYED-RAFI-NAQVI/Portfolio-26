@@ -180,6 +180,11 @@ function Card({
       data-light-art={art?.light ? "true" : "false"}
       data-playable={project.play ? "true" : "false"}
       data-art-slot={hasArt ? slot : undefined}
+      /* The composed span, exposed so narrower grids can re-map the rhythm
+         rather than discard it: a full-width row stays full width on two
+         tracks, a pair stays a pair. The inline style below drives the
+         five-track desktop grid; CSS overrides it under the breakpoints. */
+      data-span={span}
       style={{ gridColumn: `span ${span}` }}
     >
       {/* The card itself is the way in. Every project has a page, so this is

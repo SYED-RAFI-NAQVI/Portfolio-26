@@ -103,11 +103,203 @@
     grid-template-columns: minmax(0, 1fr);
     gap: 32px;
     flex: none;
-    overflow-y: auto;
+    /* Was `auto`, which made the split a scroller inside a 100vh page that
+       could not itself scroll. The page owns scrolling below this width. */
+    overflow-y: visible;
   }
   .control,
   .split > :last-child { overflow-y: visible; }
 }
+
+/* The collapse tab belongs to the docked machine, so it does not exist above
+   the breakpoint where the machine is simply part of the column. */
+.dockToggle { display: none; }
+
+/* ═══ Small screens: the machine docks, the collection scrolls ═══════════════
+   Stacked, the control column led and the gallery followed — so the
+   collection, which is the reason for the page, started a screen and a half
+   down and the machine went off-screen the moment you scrolled to it.
+
+   Inverted here. The back/mode row and the title stay at the top of the
+   document, the gallery takes the whole scroll, and the machine leaves the
+   flow entirely to sit on the bottom edge. It is the page's one control, so
+   it stays reachable instead of being something you scroll back up to.
+   ────────────────────────────────────────────────────────────────────────── */
+@media (max-width: 900px) {
+  /* Back and the mode switch pin to the top edge.
+
+     `sticky` is not an option: they live in `.control`, which holds only the
+     title and the (now fixed) machine, so its box ends a few hundred pixels
+     down and a sticky child would unstick with it. Fixed, and the page
+     reserves --bar-h to sit under it. */
+  .topBar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 30;
+    margin-bottom: 0;
+    padding: 10px 18px calc(10px);
+    padding-top: calc(10px + env(safe-area-inset-top, 0px));
+    background: rgba(10, 10, 10, 0.92);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--hairline);
+  }
+
+  /* Bigger than desktop's 34px, not smaller. On desktop this sits in a
+     40%-wide column beside the collection; here it is the full-width opening
+     line of the page, and it should carry that. */
+  .title {
+    font-size: clamp(32px, 4.4vw, 38px);
+    letter-spacing: -1.1px;
+    max-width: 22ch;
+    margin-bottom: 14px;
+  }
+
+  /* The machine is out of flow now, so everything that used to reserve room
+     under it is dead space: the column's 40px tail, the split's 32px gap and
+     the title's own margin stacked to ~96px between the headline and the
+     first card. */
+  .split { gap: 12px; }
+  .controlInner { padding-bottom: 0; }
+
+  .machineDock {
+    position: fixed;
+    left: auto;
+    right: 0;
+    bottom: 0;
+    /* Over the gallery and the page, under AboutDrawer (1000) and the game
+       player (200) — opening a game must cover the dock, not sit behind it. */
+    z-index: 40;
+
+    /* Corner panel rather than a full-width bar. The width is the ONLY size
+       given: cells are square and `itemH` is measured from the column, so the
+       machine's height falls out of this number. Wider panel, taller reels,
+       larger artwork.
+
+       Capped at 360 because 66% of a 900px tablet is 594px — most of the
+       screen for a control that only needs to be legible. */
+    width: min(62%, 360px);
+
+    /* The sound control sits at left: 24px and is roughly 150px wide at its
+       widest (the prompt state). 62% leaves the panel's left edge at ~148px
+       on a 390 screen and ~121px at 320 — clear of it without lifting the
+       pill off the corner it belongs in. */
+    max-width: calc(100% - 172px);
+
+    padding: 10px 12px calc(10px + env(safe-area-inset-bottom, 0px)) 12px;
+    background: rgba(8, 9, 10, 0.94);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: 1px solid #000;
+    border-left: 1px solid #000;
+    border-radius: 16px 0 0 0;
+    box-shadow: -14px -18px 44px -14px rgba(0, 0, 0, 0.92);
+
+    transition: transform 340ms cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  /* Slides fully off. The tab is anchored outside the panel's left edge, so
+     what is left at the screen edge is the tab alone rather than a sliver of
+     half-visible machine. */
+  .machineDock[data-hidden="true"] {
+    transform: translateX(100%);
+  }
+
+  /* Top-left, beside the box rather than on top of it — the cabinet's corner
+     is hardware and does not want a control sitting in it. */
+  /* A latch on the side of the cabinet, in the cabinet's own material: the
+     same steel gradient, the same hard black border, the same rolled edge
+     down its face. The previous chip was the one rounded, blurred,
+     drop-shadowed thing on a screen otherwise made of milled edges, which is
+     why it read as stuck on rather than built in.
+
+     Narrower and taller than a button wants to be, because a latch is. The
+     touch target is restored below without changing the drawn shape. */
+  .dockToggle {
+    position: absolute;
+    top: 14px;
+    left: -30px;
+    z-index: 1;
+
+    display: grid;
+    place-items: center;
+    width: 30px;
+    height: 64px;
+
+    border: 1px solid #000;
+    border-right: 0;
+    border-radius: 8px 0 0 8px;
+    background: linear-gradient(180deg,
+      #2e3336 0%,
+      #1a1d20 12%,
+      #121417 60%,
+      #0c0e10 100%);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.18),
+      inset 0 -2px 0 rgba(0, 0, 0, 0.8),
+      -10px 0 20px -8px rgba(0, 0, 0, 0.9);
+
+    color: #c9ced2;
+    cursor: pointer;
+    transition: color 150ms ease;
+  }
+
+  /* The drawn latch is 30px wide; the thing you press is 44. Hit area and
+     visible shape do not have to agree, and a control this narrow should not
+     be as small to hit as it is to look at. */
+  .dockToggle::before {
+    content: "";
+    position: absolute;
+    inset: -6px -7px;
+  }
+
+  /* Rolled metal down the face, the same treatment the cabinet's own sides
+     carry. Sits above the gradient and below the chevron. */
+  .dockToggle::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0.10), transparent 42%);
+  }
+
+  .dockToggle svg {
+    position: relative;
+    z-index: 1;
+    width: 15px;
+    height: 15px;
+    display: block;
+  }
+
+  .dockToggle:hover { color: var(--ink); }
+  .dockToggle:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  /* "DRAG THE KNOB DOWN" describes a throw the base plate does not have, and
+     the dock is self-evident without a caption. */
+  .foot { display: none; }
+
+  /* Clear of the docked machine so the last row of cards is reachable. */
+  .gamesChip { margin-bottom: 8px; }
+}
+
+@media (max-width: 640px) {
+  /* 33px at 390. The cap meets the tablet rule's floor at 640, so the type
+     does not step down as the screen grows. */
+  .title {
+    font-size: clamp(27px, 8.4vw, 32px);
+    letter-spacing: -0.85px;
+    max-width: none;
+  }
+  .topBar { padding-left: 16px; padding-right: 16px; }
+  .machineDock { padding: 8px 12px calc(8px + env(safe-area-inset-bottom, 0px)); }
+}
+
 
 /* ─── Playable-only chip ───────────────────────────────────────
    Set by the home page's games badge. The gallery re-ranks rather
@@ -197,4 +389,8 @@
   color: var(--ink);
   border-color: #3a3a3a;
   background: #17191b;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .machineDock { transition: none; }
 }
