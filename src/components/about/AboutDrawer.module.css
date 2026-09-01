@@ -561,7 +561,66 @@
 }
 
 /* ─── Responsive ─── */
-@media (max-width: 600px) {
+/* ─── Tablet · 641-900 ─────────────────────────────────────────────────────
+   iPad portrait fell in a dead zone: at a fixed 760px the drawer left 8px of
+   backdrop at 768 and 60px at 820 — effectively full-screen, but still
+   carrying a left border, a shadow and a slide-in from the right, so it read
+   as neither a sheet nor an overlay. Eight pixels also makes tap-outside-to-
+   dismiss impossible to hit.
+
+   Proportional in this band instead, so the backdrop never drops below ~90px
+   and the drawer stays visibly an overlay: 768 -> 660, 820 -> 705, 900 -> 760
+   where it meets the desktop cap.
+
+   Declared BEFORE the phone block on purpose. Both are max-width queries at
+   equal specificity, so a phone matches this one too — order is the only
+   thing making the 640 rules win. */
+@media (max-width: 900px) {
+  .drawer {
+    width: min(760px, 86vw);
+  }
+
+  .stickyHeader {
+    padding: calc(22px + env(safe-area-inset-top, 0px)) 24px 20px;
+  }
+
+  /* 36px is under the 44px touch minimum, and on a phone this button is the
+     ONLY way out: the sheet is full-bleed there, so the backdrop is covered
+     and tap-outside cannot fire, and touch has no Escape key. Sized here so
+     both tablet and phone inherit it. */
+  .iconButton {
+    width: 44px;
+    height: 44px;
+  }
+}
+
+@media (max-width: 640px) {
+  /* Full-bleed sheet rather than a drawer. `100%` not `100vw`: 100vw counts
+     a scrollbar gutter the drawer does not have, which is a hairline of
+     horizontal overflow on any browser that reserves one.
+
+     The left border and the drop shadow both describe an edge against the
+     page behind it. At full width there is no such edge, so they render as
+     a stray line and a dark band down the side. */
+  .drawer {
+    width: 100%;
+    max-width: 100%;
+    border-left: 0;
+    box-shadow: none;
+  }
+
+  /* Portrait on top, name and title beneath it.
+
+     This is also the fix for the drawer's horizontal overflow: the base rule
+     is `320px minmax(0, 1fr)`, and 320 plus the 32px gap is 352 against a
+     350px measure at 390 — so the avatar column alone overran the row and
+     crushed the text column beside it to nothing. It had no breakpoint of
+     any kind before this. */
+  .introTop {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 18px;
+  }
+
   .section {
     grid-template-columns: 1fr;
     gap: 16px;
@@ -570,11 +629,31 @@
     width: 100%;
     padding-top: 0;
   }
+  /* Stays two-up rather than dropping to one column. At `1fr` the six stats
+     became six 108px rows — ~648px of almost empty boxes, since each holds a
+     two-character number and a 9px label. Two columns with the box compacted
+     is ~250px for the same content, and it keeps the bordered-grid identity
+     the section has at every other width.
+
+     At 320 a box is ~116px inside its padding, so the longest label
+     ("research answers / day") wraps to two lines and still clears the
+     min-height. Nothing is dropped. */
   .statsGrid {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+  .statBox {
+    min-height: 82px;
+    padding: 13px 12px;
+  }
+  .statValue {
+    font-size: 21px;
+    margin-bottom: 2px;
+  }
+  /* Was `padding: 0 20px`, which replaced the whole shorthand — losing the
+     vertical padding AND the env(safe-area-inset-top) with it, so the title
+     and the controls sat under the notch on a full-bleed sheet. */
   .stickyHeader {
-    padding: 0 20px;
+    padding: calc(16px + env(safe-area-inset-top, 0px)) 20px 16px;
   }
   .scrollContent {
     padding: 24px 20px 80px;
