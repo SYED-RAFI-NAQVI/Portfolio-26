@@ -91,10 +91,28 @@
   filter: none;
 }
 
+/* ─── Tablet ───────────────────────────────────────────────────────────────
+   The composed layout is a five-track rhythm: each row is either one `span 5`
+   card or a `3 + 2` pair. That only reads as composition while five columns
+   exist — the grid previously kept all five down to 620px, so an iPad showed
+   five cards across ~730px, about 146px each with 16:10 artwork inside.
+
+   Below 900 the rhythm is retired for a uniform two-up. The spans are inline
+   styles from the composer, so `!important` is the only thing that reaches
+   them. Easy mode is already two-up and simply stays. */
 @media (max-width: 900px) {
-  .gridEasy {
-    grid-template-columns: minmax(0, 1fr);
-  }
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  /* The rhythm is kept, not flattened. The composer emits rows that are
+     either one `span 5` card or a `3 + 2` pair, and that maps cleanly onto
+     two tracks: a full-width row stays full width, a pair stays a pair. So
+     some cards are one-up and some are two-up, in the order the composer
+     already decided — rather than a uniform grid that throws it away.
+
+     `!important` because the span is an inline style; `data-span` carries the
+     same number as an attribute so CSS can reach it. */
+  .grid .card { grid-column: span 1 !important; }
+  .grid .card[data-span="5"] { grid-column: span 2 !important; }
 }
 
 /* De-emphasised, never removed — the collection stays legible as a whole. */
@@ -129,11 +147,14 @@
     inset 0 0 0 1px rgba(233, 169, 68, 0.16);
 }
 
-@media (max-width: 620px) {
-  .grid { grid-template-columns: minmax(0, 1fr); }
-  /* Overrides the inline span from the layout composer. */
-  .card { grid-column: 1 / -1 !important; }
-}
+/* Phones stay two-up as well, so the 900 rule above carries the whole range
+   below it. A single column made sense while the machine led the page and the
+   collection followed it; now the machine is a corner dock and the gallery
+   owns the full scroll, so full-width cards spend the whole screen on one
+   project at a time and read as a list rather than a collection.
+
+   At 390 that is ~178px a card inside the page's 16px gutters, and ~144px at
+   320 — tight, but the card's own type is 10px mono and holds. */
 
 /* Purpose-made project artwork, shown at the head of the card. */
 .cover {

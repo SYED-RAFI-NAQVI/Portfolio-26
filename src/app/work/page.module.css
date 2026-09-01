@@ -8,6 +8,51 @@
   overflow: hidden;
 }
 
-@media (max-width: 820px) {
-  .page { padding: 16px 18px 0; }
+/* The desktop page is a fixed viewport box with two independently scrolling
+   panes inside it. Once the split stacks that model stops working: the box is
+   still 100vh, the inner scroller ends underneath the iOS URL bar, and
+   `overflow: hidden` means you cannot scroll the page to reach it.
+
+   Below the split point it becomes an ordinary scrolling document. `svh`
+   rather than `vh` so the minimum is the viewport you can actually see. */
+@media (max-width: 1180px) {
+  .page {
+    height: auto;
+    min-height: 100svh;
+    overflow: visible;
+  }
+}
+
+@media (max-width: 900px) {
+  /* Height of the docked machine, and the single source of truth for it: the
+     gallery pads itself clear of the dock with this, and the sound control
+     reads the same value to sit above it rather than under it.
+
+     Measured, not guessed: cabinet 7 + screen 5 + reel 62 + screen 5 +
+     cabinet 7, plus the plate at 9 + 42 + 10, plus the dock's own 10 + 10. */
+  /* Room reserved under the collection so its last row clears the docked
+     machine, and the value the sound control reads to sit above it.
+
+     Deliberately generous rather than exact: the machine's height is derived
+     from its measured width, so it is not a number this file can know. Over-
+     reserving costs a little empty scroll; under-reserving hides a card. */
+  .page {
+    --dock-h: 230px;
+    /* Height of the pinned Back / mode bar, which is fixed and so out of
+       flow — the page has to reserve its row explicitly. */
+    --bar-h: 54px;
+    padding: calc(var(--bar-h) + env(safe-area-inset-top, 0px) + 14px)
+             18px
+             calc(var(--dock-h) + 20px);
+  }
+}
+
+@media (max-width: 640px) {
+  .page {
+    --dock-h: 215px;
+    --bar-h: 54px;
+    padding: calc(var(--bar-h) + env(safe-area-inset-top, 0px) + 12px)
+             16px
+             calc(var(--dock-h) + 16px);
+  }
 }

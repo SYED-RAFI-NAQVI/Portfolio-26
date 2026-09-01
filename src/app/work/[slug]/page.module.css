@@ -127,3 +127,47 @@
 .visit:hover { background: rgba(255, 255, 255, 0.1); border-color: #4d5357; }
 .visit span { transition: transform 200ms ease; }
 .visit:hover span { transform: translate(2px, -2px); }
+
+/* ═══ Responsive ══════════════════════════════════════════════════════════════
+   This file had no breakpoints at all, so all 37 project pages ran desktop
+   geometry at every width.
+   ────────────────────────────────────────────────────────────────────────── */
+
+@media (max-width: 900px) {
+  .page {
+    padding: 28px 20px 96px;
+    gap: 28px;
+  }
+  .name { font-size: 34px; }
+  .lede { font-size: 17px; }
+}
+
+@media (max-width: 640px) {
+  .page {
+    padding: 20px 18px 80px;
+    gap: 24px;
+  }
+
+  .name {
+    font-size: 27px;
+    letter-spacing: -0.015em;
+  }
+  .lede { font-size: 16px; }
+
+  /* The 120px term column left ~190px for values at 390 wide, so anything
+     longer than a word wrapped to three or four lines against a mostly empty
+     label column. Term over value instead. */
+  .meta {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 4px 0;
+  }
+  .meta dt { padding-top: 12px; }
+  .meta dt:first-of-type { padding-top: 0; }
+
+  /* Full-width so the primary action is a real target rather than a chip. */
+  .visit {
+    align-self: stretch;
+    justify-content: center;
+    height: 46px;
+  }
+}
