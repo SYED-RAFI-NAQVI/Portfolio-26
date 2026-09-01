@@ -1,0 +1,212 @@
+/* The phone navigation. Both this and the bar in SiteNav render on every page;
+   a single breakpoint decides which is visible, so nothing is swapped at
+   runtime. Above 640px this file draws nothing at all. */
+
+.trigger,
+.sheet {
+  display: none;
+}
+
+@media (max-width: 640px) {
+  /* ─── Trigger ─────────────────────────────────────────────── */
+
+  .trigger {
+    justify-self: end;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    height: 40px;
+    padding: 0 14px;
+
+    border: 1px solid var(--hairline);
+    background: var(--canvas-elevated);
+    color: var(--body);
+
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    cursor: pointer;
+    transition: color 150ms ease, background 150ms ease;
+  }
+
+  .trigger:hover { color: var(--ink); }
+  .trigger:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  /* Two rules, not three — the third adds nothing at this size and the pair
+     reads as a mark rather than a hamburger. */
+  .burger {
+    display: grid;
+    gap: 3px;
+  }
+  .burger span {
+    display: block;
+    width: 13px;
+    height: 1px;
+    background: currentColor;
+  }
+
+  /* ─── Sheet ───────────────────────────────────────────────── */
+
+  .sheet {
+    position: fixed;
+    inset: 0;
+    /* Above the fixed controls (100) and the game player (200), deliberately
+       below AboutDrawer (1000): tapping About should open the drawer over
+       this, not behind it. */
+    z-index: 900;
+
+    display: flex;
+    flex-direction: column;
+    padding:
+      max(20px, env(safe-area-inset-top)) 20px
+      max(24px, env(safe-area-inset-bottom));
+
+    background: var(--canvas);
+
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 220ms ease, visibility 220ms;
+  }
+
+  .sheet[data-open="true"] {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+  }
+
+  .sheetTop {
+    flex: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 40px;
+  }
+
+  .eyebrow {
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+
+  .close {
+    display: inline-flex;
+    align-items: center;
+    height: 40px;
+    padding: 0 14px;
+    border: 1px solid var(--hairline);
+    background: var(--canvas-elevated);
+    color: var(--body);
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 10.5px;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    cursor: pointer;
+  }
+
+  .close:hover { color: var(--ink); }
+  .close:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 2px;
+  }
+
+  /* ─── Destinations ────────────────────────────────────────── */
+
+  /* Bottom-aligned: the thumb is down there, and it puts the list where the
+     hero's own text sits rather than floating it mid-screen. */
+  .sheetNav {
+    margin-top: auto;
+    margin-bottom: 26px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* The hero's type, at the hero's tracking — this is the whole idea. */
+  .item {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+    padding: 9px 0;
+
+    font-size: clamp(32px, 9.6vw, 44px);
+    font-weight: 400;
+    line-height: 1.06;
+    letter-spacing: -0.05em;
+
+    color: var(--mute);
+    text-decoration: none;
+    border-bottom: 1px solid var(--hairline-soft);
+
+    opacity: 0;
+    transform: translateY(9px);
+  }
+
+  .item:last-child { border-bottom: 0; }
+  .item.here { color: var(--ink); }
+  .item:focus-visible {
+    outline: 2px solid var(--ink);
+    outline-offset: 3px;
+  }
+
+  .idx {
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 10px;
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    color: var(--faint);
+  }
+
+  .word { flex: none; }
+
+  /* Fills the measure only on the current page — the line is the "you are
+     here", so it carries information rather than decorating every row. */
+  .rule {
+    flex: 1;
+    height: 1px;
+    background: transparent;
+  }
+  .item.here .rule { background: var(--hairline); }
+
+  .sheet[data-open="true"] .item {
+    animation: navRise 420ms cubic-bezier(0.22, 1, 0.36, 1) forwards;
+  }
+  .sheet[data-open="true"] .item:nth-child(1) { animation-delay: 40ms; }
+  .sheet[data-open="true"] .item:nth-child(2) { animation-delay: 90ms; }
+  .sheet[data-open="true"] .item:nth-child(3) { animation-delay: 140ms; }
+  .sheet[data-open="true"] .item:nth-child(4) { animation-delay: 190ms; }
+
+  @keyframes navRise {
+    to {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .foot {
+    flex: none;
+    font-family: var(--font-geist-mono), monospace;
+    font-size: 9.5px;
+    font-weight: 500;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--faint);
+  }
+}
+
+@media (max-width: 640px) and (prefers-reduced-motion: reduce) {
+  .sheet { transition: none; }
+  .sheet .item {
+    opacity: 1;
+    transform: none;
+    animation: none;
+  }
+}
